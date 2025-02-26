@@ -1,12 +1,11 @@
 name: Laravel
 
 on:
-  workflow_dispatch:
-    branches: [ "main", "sit", "uat" ]
   push:
     branches: [ "main", "sit", "uat" ]
   pull_request:
     branches: [ "main", "sit", "uat" ]
+  workflow_dispatch:
 
 jobs:
   laravel-tests:
