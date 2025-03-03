@@ -15,7 +15,10 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Poppins', 'Montserrat', 'Orbitron', ...defaultTheme.fontFamily.sans],
+            },
+            fontWeight: {
+                bold: '700',
             },
         },
     },
