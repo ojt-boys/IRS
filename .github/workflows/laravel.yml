@@ -2,7 +2,7 @@ name: Laravel
 
 on:
   push:
-    branches: [ "main", "sit", "uat" ]
+    branches: [ "main", "sit", "uat", "sit-#2" ]
   pull_request:
     branches: [ "main", "sit", "uat" ]
   workflow_dispatch:
