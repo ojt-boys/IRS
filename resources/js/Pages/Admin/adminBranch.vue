@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import AppSidebar from '@/Components/AppSidebar.vue';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 
-defineProps({
-  title: String,
-});
+
+
 
 </script>
 
@@ -13,24 +11,22 @@ defineProps({
   <SidebarProvider>
     <div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
       <!-- Sidebar -->
-      <AppSidebar />
+      <AppSidebar class="bg-white w-64 min-h-screen" />
+
       
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
 
-        <Head :title="title" />
+       
         
         <header class="bg-white dark:bg-gray-800 shadow px-6 py-4 flex items-center justify-between w-full">
           <SidebarTrigger class="text-gray-500 dark:text-gray-400" />
-          <div class="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            {{ title }}
-          </div>
-          
+          <h1>Welcome to the Admin Branch</h1>
 
         </header>
 
         <main class="p-6">
-          <slot />
+          <p class="text-gray-700">Dashboard Content Goes Here</p>
         </main>
       </div>
     </div>
