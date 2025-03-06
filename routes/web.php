@@ -21,4 +21,52 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+
+
+    Route::get('/admin/adminDashboard', function () {
+        return Inertia::render('Admin/adminDashboard'); 
+    })->name('admin.dashboard');
+
+    Route::get('/admin/adminIncoming', function () {
+        return Inertia::render('Admin/adminIncoming'); 
+    })->name('admin.Incoming');
+
+    Route::get('/admin/adminForchecking', function () {
+        return Inertia::render('Admin/adminForchecking'); 
+    })->name('admin.adminForchecking');
+
+    Route::get('/admin/adminStatusrepairing', function () {
+        return Inertia::render('Admin/adminStatusrepairing'); 
+    })->name('admin.adminStatusrepairing');
+
+    Route::get('/admin/adminStatusfailed', function () {
+        return Inertia::render('Admin/adminStatusfailed'); 
+    })->name('admin.adminStatusfailed');
+
+
+    Route::get('/admin/adminRefund', function () {
+        return Inertia::render('Admin/adminRefund'); 
+    })->name('admin.adminRefund');
+
+
+    Route::get('/admin/adminForreturn', function () {
+        return Inertia::render('Admin/adminForreturn'); 
+    })->name('admin.adminForreturn');
+
+
+
+    Route::get('/admin/adminCompleted', function () {
+        return Inertia::render('Admin/adminCompleted'); 
+    })->name('admin.adminCompleted');
+
+    Route::get('/admin/adminPayments', function () {
+        return Inertia::render('Admin/adminPayments'); 
+    })->name('admin.adminPayments');
+
+    Route::get('/admin/adminBranch', function () {
+        return Inertia::render('Admin/adminBranch'); 
+    })->name('admin.adminBranch');
+  
+
 });
