@@ -1,6 +1,5 @@
 <script setup>
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 
 const props = defineProps({
   class: { type: null, required: false },
@@ -8,15 +7,14 @@ const props = defineProps({
 </script>
 
 <template>
-  <Input
-    data-sidebar="input"
+  <th
     :class="
       cn(
-        'h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+        'h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5',
         props.class,
       )
     "
   >
     <slot />
-  </Input>
+  </th>
 </template>

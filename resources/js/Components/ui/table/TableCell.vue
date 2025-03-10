@@ -1,6 +1,5 @@
 <script setup>
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
 
 const props = defineProps({
   class: { type: null, required: false },
@@ -8,10 +7,14 @@ const props = defineProps({
 </script>
 
 <template>
-  <Separator
-    data-sidebar="separator"
-    :class="cn('mx-2 w-auto bg-sidebar-border', props.class)"
+  <td
+    :class="
+      cn(
+        'p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5',
+        props.class,
+      )
+    "
   >
     <slot />
-  </Separator>
+  </td>
 </template>
