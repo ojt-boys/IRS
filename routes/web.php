@@ -36,18 +36,9 @@ Route::middleware([
         return Inertia::render('Admin/adminForchecking'); 
     })->name('admin.adminForchecking');
 
-    Route::get('/admin/adminStatusrepairing', function () {
-        return Inertia::render('Admin/adminStatusrepairing'); 
-    })->name('admin.adminStatusrepairing');
-
-    Route::get('/admin/adminStatusfailed', function () {
-        return Inertia::render('Admin/adminStatusfailed'); 
-    })->name('admin.adminStatusfailed');
-
-
-    Route::get('/admin/adminRefund', function () {
-        return Inertia::render('Admin/adminRefund'); 
-    })->name('admin.adminRefund');
+    Route::get('/admin/adminStatus', function () {
+        return Inertia::render('Admin/adminStatus'); 
+    })->name('admin.adminStatus');
 
 
     Route::get('/admin/adminForreturn', function () {
