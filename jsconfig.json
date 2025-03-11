@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["resources/js/*"]
-        }
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["resources/js/*"]
+      },
+      "types": ["@inertiajs/inertia"]
     },
     "exclude": ["node_modules", "public"]
-}
+  }
+  

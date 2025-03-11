@@ -63,6 +63,24 @@ const earningsData = ref({
   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   data: [2400, 2210, 2290, 2000, 2181, 2500],
 });
+
+// Modal data and visibility
+const showModal = ref(false);
+const selectedItem = ref(null);
+
+
+
+const openModal = (item: any) => {
+  selectedItem.value = item;
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  selectedItem.value = null;
+};
+
+
 </script>
 
 <template>
@@ -121,12 +139,33 @@ const earningsData = ref({
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
                   <TableCell class="px-4 py-2">
-                    <Button size="sm" variant="outline">Details</Button>
+                    <Button size="sm" variant="outline" @click="openModal(item)">Details</Button>
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </div>
+
+
+          <!-- Modal (Pop-up) -->
+          <div v-if="showModal" class="fixed inset-0 z-50 flex justify-center items-center bg-gray-800 bg-opacity-50">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+              <div class="text-center">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h3>
+                <div class="mt-4">
+                  <p><strong>ID:</strong> {{ selectedItem.id }}</p>
+                  <p><strong>Branch:</strong> {{ selectedItem.branch }}</p>
+                  <p><strong>Status:</strong> {{ selectedItem.status }}</p>
+                  <p><strong>Service:</strong> {{ selectedItem.service }}</p>
+                  <p><strong>Payment:</strong> {{ selectedItem.payment }}</p>
+                </div>
+                <div class="mt-6">
+                  <Button @click="closeModal" class="w-full">Close</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
 
         </main>
       </div>

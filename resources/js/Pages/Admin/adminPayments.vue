@@ -6,22 +6,32 @@ import { ref, computed } from "vue";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { ChevronDown, ChevronRight } from "lucide-vue-next";
+import { ChevronRight, ArrowUp, ArrowDown } from "lucide-vue-next";
+import { Inertia } from '@inertiajs/inertia';  // Import Inertia for navigation
 
 const title = "Payments";
 
 const tableData = ref([
-  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "Unpaid", dateTime: "2025-03-07 14:30" },
-  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "Unpaid", dateTime: "2025-03-07 16:00" },
-  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Paid", dateTime: "2025-03-07 18:45" },
-  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Paid", dateTime: "2025-03-08 10:15" },
+  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "Unpaid", dateTime: "2025-03-07 14:30", paidAmount: null, paidDate: null },
+  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "Refund", dateTime: "2025-03-07 16:00", paidAmount: null, paidDate: null },
+  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Paid", dateTime: "2025-03-07 18:45", paidAmount: null, paidDate: null },
+  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Refunded", dateTime: "2025-03-08 10:15", paidAmount: 50, paidDate: "2025-03-08 12:00" },
+  { batch: 2, id: 5, branch: "204", service: "Waterproofing", shoe: "New Balance 574", status: "Unpaid", dateTime: "2025-03-08 12:45", paidAmount: 30, paidDate: "2025-03-08 14:00" },
 ]);
 
 const searchQuery = ref("");
-const expandedBatches = ref<number[]>([]);
+const activeBatch = ref<number | null>(null);
+const sortedBatches = ref<Record<number, { column: string; order: "asc" | "desc" }>>({});
 
+// Modal states
+const showModal = ref(false); // Controls visibility of the modal
+const modalMessage = ref(''); // The message to be displayed in the modal
+const currentItem = ref<any>(null); // The item that's currently being viewed for confirmation
+
+// Filtered table data based on search query
 const filteredTableData = computed(() => {
   if (!searchQuery.value) return tableData.value;
+
   return tableData.value.filter(item =>
     Object.values(item).some(value =>
       value.toString().toLowerCase().includes(searchQuery.value.toLowerCase())
@@ -29,24 +39,88 @@ const filteredTableData = computed(() => {
   );
 });
 
+// Get unique batch numbers after filtering
 const uniqueBatches = computed(() => {
   return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
 });
 
-const toggleBatch = (batch: number) => {
-  if (expandedBatches.value.includes(batch)) {
-    expandedBatches.value = expandedBatches.value.filter(b => b !== batch);
+// Sorting logic
+const sortBatchContents = (batch: number, column: string) => {
+  if (sortedBatches.value[batch]?.column === column) {
+    sortedBatches.value[batch].order = sortedBatches.value[batch].order === "asc" ? "desc" : "asc";
   } else {
-    expandedBatches.value.push(batch);
+    sortedBatches.value[batch] = { column, order: "asc" };
   }
 };
 
+const getSortedBatchItems = (batch: number) => {
+  const batchItems = filteredTableData.value.filter(item => item.batch === batch);
+  const sorting = sortedBatches.value[batch];
+
+  if (sorting) {
+    return [...batchItems].sort((a, b) => {
+      const valueA = a[sorting.column as keyof typeof a].toString();
+      const valueB = b[sorting.column as keyof typeof b].toString();
+      return sorting.order === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+    });
+  }
+
+  return batchItems;
+};
+
+// Status styling
 const getStatusClass = (status: string) => {
-  return status === "Unpaid" ? "bg-yellow-500 text-black" :
+  return status === "Unpaid" ? "bg-yellow-500 text-white" :
          status === "Paid" ? "bg-green-500 text-white" :
+         status === "Refund" ? "bg-orange-500 text-white" :
+         status === "Refunded" ? "bg-green-500 text-white" :
          "bg-gray-300 text-black";
 };
+
+// Show batch details
+const showBatchDetails = (batch: number) => {
+  activeBatch.value = batch;
+};
+
+// Go back to the batch list
+const goBackToBatches = () => {
+  activeBatch.value = null;
+};
+
+// Open the confirmation modal with appropriate message based on status
+const openConfirmationModal = (item: any) => {
+  currentItem.value = item;
+
+  if (item.status === "Unpaid") {
+    modalMessage.value = "The payment status is Unpaid. Are you sure you want to proceed?";
+  } else if (item.status === "Paid") {
+    modalMessage.value = `The payment was made for ${item.shoe} on ${item.paidDate}. Amount paid: $${item.paidAmount}.`;
+  } else if (item.status === "Refund") {
+    modalMessage.value = `The payment was made for ${item.shoe} on ${item.paidDate}. Amount paid: $${item.paidAmount}.`;
+  } else if (item.status === "Refunded") {
+    modalMessage.value = `The payment was made for ${item.shoe} on ${item.paidDate}. Amount paid: $${item.paidAmount}.`;
+  }
+
+  showModal.value = true;
+};
+
+// Close the modal
+const closeModal = () => {
+  showModal.value = false;
+};
+
+// Confirm the action (for example, perform an action based on the status)
+const confirmAction = () => {
+  if (currentItem.value?.status === "Unpaid") {
+    // Implement logic for "Unpaid" status (e.g., allow payment, etc.)
+  }
+  closeModal();
+};
+
 </script>
+
+
+
 
 <template>
   <SidebarProvider>
@@ -67,7 +141,7 @@ const getStatusClass = (status: string) => {
               <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
             </div>
 
-            <Table class="w-full border rounded-lg">
+            <Table v-if="activeBatch === null" class="w-full border rounded-lg">
               <TableHeader>
                 <TableRow class="bg-gray-200 dark:bg-gray-700">
                   <TableHead class="px-4 py-2 text-left">Batch</TableHead>
@@ -75,23 +149,42 @@ const getStatusClass = (status: string) => {
                   <TableHead class="px-4 py-2 text-center">Service</TableHead>
                   <TableHead class="px-4 py-2 text-center">Branch No.</TableHead>
                   <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Status</TableHead>
                   <TableHead class="px-4 py-2 text-center">Action</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 <template v-for="(batchGroup, index) in uniqueBatches" :key="index">
-                  <TableRow @click="toggleBatch(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
+                  <TableRow @click="showBatchDetails(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
                     <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
                       <button class="flex items-center w-full text-left p-2">
-                        <component :is="expandedBatches.includes(batchGroup) ? ChevronDown : ChevronRight" class="w-4 h-4 mr-2" />
                         Batch {{ batchGroup }}
                       </button>
                     </TableCell>
                   </TableRow>
-                  <template v-if="expandedBatches.includes(batchGroup)">
-                    <TableRow v-for="item in filteredTableData.filter(i => i.batch === batchGroup)" :key="item.id" class="border-b last:border-b-0">
-                      <TableCell class="px-4 py-2 text-center">{{ batchGroup }}</TableCell>
+                </template>
+              </TableBody>
+            </Table>
+
+            <div v-if="activeBatch !== null">
+              <Button @click="goBackToBatches" class="mb-4">Back</Button>
+              <Table class="w-full border rounded-lg">
+                <TableHeader>
+                  <TableRow class="bg-gray-200 dark:bg-gray-700">
+                    <TableHead class="px-4 py-2 text-left">Batch</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Shoe</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Service</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Branch No.</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Status</TableHead>
+                    <TableHead class="px-4 py-2 text-center">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  <template v-for="item in getSortedBatchItems(activeBatch)" :key="item.id">
+                    <TableRow>
+                      <TableCell class="px-4 py-2 text-center">{{ activeBatch }}</TableCell>
                       <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
                       <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
                       <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
@@ -102,16 +195,29 @@ const getStatusClass = (status: string) => {
                         </span>
                       </TableCell>
                       <TableCell class="px-4 py-2 text-center">
-                        <Button size="sm" variant="outline">Details</Button>
+                        <Button size="sm" variant="outline" @click="openConfirmationModal(item)">Details</Button>
                       </TableCell>
                     </TableRow>
                   </template>
-                </template>
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </main>
       </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div v-if="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div class="text-xl mb-4">{{ modalMessage }}</div>
+        <div class="flex justify-end space-x-4">
+          <Button @click="closeModal" variant="outline">No</Button>
+          <Button @click="confirmAction" variant="primary">Yes</Button>
+        </div>
+      </div>
+    </div>
   </SidebarProvider>
 </template>
+
+

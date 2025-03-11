@@ -1,4 +1,6 @@
 <script setup>
+import { onMounted } from 'vue';
+// other imports
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
@@ -17,6 +19,11 @@ const form = useForm({
     email: '',
     password: '',
     remember: false,
+});
+
+// Auto-focus email input after component is mounted
+onMounted(() => {
+    document.getElementById('email')?.focus();
 });
 
 const submit = () => {
@@ -50,7 +57,6 @@ const submit = () => {
                     type="email"
                     class="mt-1 block w-full"
                     required
-                    autofocus
                     autocomplete="username"
                 />
                 <InputError class="mt-2" :message="form.errors.email" />
