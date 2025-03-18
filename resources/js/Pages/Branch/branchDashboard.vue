@@ -6,8 +6,7 @@ import { ref, computed } from "vue";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import BarChart from "@/Components/BarChart.vue";
-import GaugeChart from "@/Components/GaugeChart.vue";
+
 
 // Modal state and shoe details
 const modalOpen = ref(false);
@@ -18,7 +17,7 @@ const selectedShoeDetails = ref({
   picture: '', // Placeholder for the shoe image URL
 });
 
-const title = "Dashboard";
+const title = "Branch Dashboard";
 
 // Sample table data
 const tableData = ref([
@@ -56,22 +55,6 @@ const sortTable = (key: string) => {
   }
 };
 
-// Sample chart data
-const profitsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [4000, 3000, 2000, 2780, 1890, 2390],
-});
-
-const ordersData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 1398, 9800, 3908, 4800, 3800],
-});
-
-const earningsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 2210, 2290, 2000, 2181, 2500],
-});
-
 // Open modal function with static sample shoe data
 const showModal = (shoe: any) => {
   selectedShoeDetails.value = {
@@ -103,25 +86,6 @@ const closeModal = () => {
         </header>
         <main class="flex-1 p-6 w-full">
 
-          <!-- Stats Section (Orders & Profits) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
-              <h2 class="text-sm text-gray-500 dark:text-gray-400">Orders</h2>
-              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">2,560</p>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
-              <h2 class="text-sm text-gray-500 dark:text-gray-400">Profits</h2>
-              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">$6,250</p>
-            </div>
-          </div>
-
-          <!-- Charts Section (3 Bar Charts) -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <GaugeChart title="Profits" :value="6250" :max="10000" />
-            <BarChart title="Orders" :chartData="ordersData" color="#82ca9d" />
-            <BarChart title="Earnings" :chartData="earningsData" color="#ffc658" />
-          </div>
 
           <!-- Search & Table Section -->
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">

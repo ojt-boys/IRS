@@ -6,7 +6,6 @@ import { ref, computed } from "vue";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { ChevronDown, ChevronRight } from "lucide-vue-next";
 
 const title = "Completed";
 
@@ -18,8 +17,18 @@ const tableData = ref([
 ]);
 
 const searchQuery = ref("");
-const expandedBatches = ref<number[]>([]);
+const activeBatch = ref<number | null>(null);
 
+// Modal States
+const modalOpen = ref(false);
+const selectedShoeDetails = ref({
+  shoe: 'Nike Air Max',
+  description: 'This is a popular model known for its comfort and style.',
+  brand: 'Nike',
+  image: 'https://via.placeholder.com/150',
+});
+
+// Filtered table data based on search query
 const filteredTableData = computed(() => {
   if (!searchQuery.value) return tableData.value;
   return tableData.value.filter(item =>
@@ -29,24 +38,48 @@ const filteredTableData = computed(() => {
   );
 });
 
+// Get unique batch numbers after filtering
 const uniqueBatches = computed(() => {
   return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
 });
 
-const toggleBatch = (batch: number) => {
-  if (expandedBatches.value.includes(batch)) {
-    expandedBatches.value = expandedBatches.value.filter(b => b !== batch);
-  } else {
-    expandedBatches.value.push(batch);
-  }
+// Function to show batch details
+const showBatchDetails = (batch: number) => {
+  activeBatch.value = batch;
 };
 
-const getStatusClass = (status: string) => {
-  return status === "Ready to Pick Up" ? "bg-yellow-500 text-black" :
-         status === "Completed" ? "bg-green-500 text-white" :
-         "bg-gray-300 text-black";
+// Go back to the batch list
+const goBackToBatches = () => {
+  activeBatch.value = null;
 };
+
+// Function to open the modal with shoe details
+const showShoeDetails = (shoe: any) => {
+  selectedShoeDetails.value = {
+    shoe: shoe.shoe,
+    description: `Description for ${shoe.shoe}`,
+    brand: "Brand: Nike",
+    image: 'https://via.placeholder.com/150',
+  };
+  modalOpen.value = true; // Open the modal when a shoe is selected
+};
+
+// Function to close the shoe details modal
+const closeModal = () => {
+  modalOpen.value = false; // Close the modal
+};
+
+
+
+const statusColor = (status: string) => {
+  if (status === "Ready to Pick Up") return "bg-yellow-500 text-black";
+  if (status === "Completed") return "bg-green-500 text-white";
+  return "bg-gray-300 text-black";
+};
+
 </script>
+
+
 
 <template>
   <SidebarProvider>
@@ -67,6 +100,13 @@ const getStatusClass = (status: string) => {
               <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
             </div>
 
+            <!-- Display a back button if a batch is selected -->
+            <div v-if="activeBatch !== null" class="mb-4">
+              <Button @click="goBackToBatches" class="mb-4">
+                Back
+              </Button>
+            </div>
+
             <Table class="w-full border rounded-lg">
               <TableHeader>
                 <TableRow class="bg-gray-200 dark:bg-gray-700">
@@ -79,32 +119,39 @@ const getStatusClass = (status: string) => {
                   <TableHead class="px-4 py-2 text-center">Action</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                <template v-for="(batchGroup, index) in uniqueBatches" :key="index">
-                  <TableRow @click="toggleBatch(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
-                    <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
-                      <button class="flex items-center w-full text-left p-2">
-                        <component :is="expandedBatches.includes(batchGroup) ? ChevronDown : ChevronRight" class="w-4 h-4 mr-2" />
+                <template v-if="activeBatch === null">
+                  <template v-for="(batchGroup, index) in uniqueBatches" :key="index">
+                    <TableRow @click="showBatchDetails(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
+                      <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
                         Batch {{ batchGroup }}
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                  <template v-if="expandedBatches.includes(batchGroup)">
-                    <TableRow v-for="item in filteredTableData.filter(i => i.batch === batchGroup)" :key="item.id" class="border-b last:border-b-0">
-                      <TableCell class="px-4 py-2 text-center">{{ batchGroup }}</TableCell>
-                      <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
-                      <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
-                      <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
-                      <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
-                      <TableCell class="px-4 py-2 text-center">
-                        <span :class="['px-3 py-1 rounded-lg text-sm font-semibold', getStatusClass(item.status)]">
-                          {{ item.status }}
-                        </span>
-                      </TableCell>
-                      <TableCell class="px-4 py-2 text-center">
-                        <Button size="sm" variant="outline">Details</Button>
                       </TableCell>
                     </TableRow>
+                  </template>
+                </template>
+
+                <template v-else>
+                  <template v-for="item in filteredTableData" :key="item.id">
+                    <template v-if="item.batch === activeBatch">
+                      <TableRow class="border-b last:border-b-0">
+                        <TableCell class="px-4 py-2 text-center">{{ item.batch }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span>
+
+                        </TableCell>
+                        <TableCell class="px-4 py-2 text-center">
+                          <Button size="sm" variant="outline" @click="showShoeDetails(item)">
+                            Detail
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </template>
                   </template>
                 </template>
               </TableBody>
@@ -113,5 +160,37 @@ const getStatusClass = (status: string) => {
         </main>
       </div>
     </div>
+
+    <!-- Modal for shoe details -->
+    <div v-if="modalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
+          <Button @click="closeModal" size="sm" variant="outline">Close</Button>
+        </div>
+        <div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Shoe:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.shoe }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.description }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Picture:</strong>
+            <div class="flex justify-center items-center h-48 bg-gray-200 dark:bg-gray-700">
+              <img :src="selectedShoeDetails.image" alt="Shoe Image" class="max-h-full max-w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </SidebarProvider>
 </template>
+
+

@@ -7,17 +7,18 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 
-const title = "Payments";
+const title = "Assessment";
 
 const tableData = ref([
-  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "Unpaid", dateTime: "2025-03-07 14:30" },
-  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "Paid", dateTime: "2025-03-07 16:00" },
-  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Refund", dateTime: "2025-03-07 18:45" },
-  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Paid", dateTime: "2025-03-08 10:15" },
+  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", dateTime: "2025-03-07 14:30" },
+  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", dateTime: "2025-03-07 16:00" },
+  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", dateTime: "2025-03-07 18:45" },
+  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", dateTime: "2025-03-08 10:15" },
+  { batch: 2, id: 5, branch: "204", service: "Waterproofing", shoe: "New Balance 574", dateTime: "2025-03-08 12:45" },
 ]);
 
 const searchQuery = ref("");
-const activeBatch = ref<number | null>(null);
+const selectedBatch = ref<number | null>(null);
 
 // Modal States
 const modalOpen = ref(false);
@@ -27,6 +28,11 @@ const selectedShoeDetails = ref({
   brand: 'Nike',
   image: 'https://via.placeholder.com/150',
 });
+
+// Popup States for Accept/Decline
+const isPopupVisible = ref(false);
+const isDeclinePopup = ref(false);
+const declineReason = ref("");
 
 // Filtered table data based on search query
 const filteredTableData = computed(() => {
@@ -43,14 +49,14 @@ const uniqueBatches = computed(() => {
   return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
 });
 
-// Function to show batch details
-const showBatchDetails = (batch: number) => {
-  activeBatch.value = batch;
+// Function to select a batch and display its data
+const selectBatch = (batch: number) => {
+  selectedBatch.value = batch;
 };
 
-// Go back to the batch list
-const goBackToBatches = () => {
-  activeBatch.value = null;
+// Function to go back to the list of batches
+const goBack = () => {
+  selectedBatch.value = null;
 };
 
 // Function to open the modal with shoe details
@@ -69,18 +75,30 @@ const closeModal = () => {
   modalOpen.value = false; // Close the modal
 };
 
-
-
-const statusColor = (status: string) => {
-  if (status === "Unpaid") return "bg-yellow-500 text-black";
-  if (status === "Refund") return "bg-orange-500 text-black";
-  if (status === "Paid") return "bg-green-500 text-white";
-  return "bg-gray-300 text-black";
+// Modal handling for "Accept" and "Decline"
+const confirmAction = (action: string, item: any) => {
+  // Show the confirmation popup
+  isPopupVisible.value = true;
+  if (action === 'Decline') {
+    isDeclinePopup.value = true; // Show the decline reason input
+  } else {
+    isDeclinePopup.value = false; // Show the accept confirmation
+  }
+  console.log(`Action: ${action} on item`, item);
 };
 
+const handleDecline = () => {
+  // Handle decline logic here (e.g., store the reason and update status)
+  console.log(`Declined for reason: ${declineReason.value}`);
+  isPopupVisible.value = false; // Close the popup
+};
+
+const handleAccept = () => {
+  // Handle accept logic here
+  console.log('Accepted');
+  isPopupVisible.value = false; // Close the popup
+};
 </script>
-
-
 
 <template>
   <SidebarProvider>
@@ -102,8 +120,8 @@ const statusColor = (status: string) => {
             </div>
 
             <!-- Display a back button if a batch is selected -->
-            <div v-if="activeBatch !== null" class="mb-4">
-              <Button @click="goBackToBatches" class="mb-4">
+            <div v-if="selectedBatch !== null" class="mb-4">
+              <Button @click="goBack" class="mb-4">
                 Back
               </Button>
             </div>
@@ -116,15 +134,15 @@ const statusColor = (status: string) => {
                   <TableHead class="px-4 py-2 text-center">Service</TableHead>
                   <TableHead class="px-4 py-2 text-center">Branch No.</TableHead>
                   <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Status</TableHead>
                   <TableHead class="px-4 py-2 text-center">Action</TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
-                <template v-if="activeBatch === null">
+                <!-- Show batches or the selected batch data -->
+                <template v-if="selectedBatch === null">
                   <template v-for="(batchGroup, index) in uniqueBatches" :key="index">
-                    <TableRow @click="showBatchDetails(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
+                    <TableRow @click="selectBatch(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
                       <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
                         Batch {{ batchGroup }}
                       </TableCell>
@@ -132,23 +150,32 @@ const statusColor = (status: string) => {
                   </template>
                 </template>
 
+                <!-- Display selected batch data -->
                 <template v-else>
                   <template v-for="item in filteredTableData" :key="item.id">
-                    <template v-if="item.batch === activeBatch">
+                    <template v-if="item.batch === selectedBatch">
                       <TableRow class="border-b last:border-b-0">
                         <TableCell class="px-4 py-2 text-center">{{ item.batch }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
-                        <TableCell class="px-4 py-2 text-center">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
-                      {{ item.status }}
-                    </span>
-
-                        </TableCell>
                         <TableCell class="px-4 py-2 text-center">
+                          <!-- Detail Button -->
                           <Button size="sm" variant="outline" @click="showShoeDetails(item)">
                             Detail
+                          </Button>
+
+                          <!-- Accept Button -->
+                          <Button size="sm" variant="outline" class="ml-2 text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
+                                  @click="confirmAction('Accept', item)">
+                            Accept
+                          </Button>
+
+                          <!-- Decline Button -->
+                          <Button size="sm" variant="outline" class="ml-2 text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                                  @click="confirmAction('Decline', item)">
+                            Decline
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -191,7 +218,31 @@ const statusColor = (status: string) => {
         </div>
       </div>
     </div>
+
+    <!-- Modal for confirmation (Accept/Decline) -->
+    <div v-if="isPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+            Are you sure you want to {{ isDeclinePopup ? 'Decline' : 'Accept' }}?
+          </h2>
+          <Button @click="isPopupVisible = false" size="sm" variant="outline">Close</Button>
+        </div>
+        
+        <!-- Decline reason input -->
+        <div v-if="isDeclinePopup">
+          <Input v-model="declineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
+        </div>
+
+        <div class="flex justify-between">
+          <Button @click="isPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
+            Cancel
+          </Button>
+          <Button @click="isDeclinePopup ? handleDecline() : handleAccept()" class="bg-green-500 text-white hover:bg-green-600">
+            Confirm
+          </Button>
+        </div>
+      </div>
+    </div>
   </SidebarProvider>
 </template>
-
-
