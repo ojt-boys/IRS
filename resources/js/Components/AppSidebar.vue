@@ -24,16 +24,23 @@ import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 const items = [
   { title: "Dashboard", url: "/admin/adminDashboard", icon: Home },
   { title: "Incoming", url: "/admin/adminIncoming", icon: Inbox },
-  { title: "Assesment", url: "/admin/adminForchecking", icon: ClipboardCheck },
-  { title: "Job Order", url: "/admin/adminStatus", icon: Search },
-  { title: "Returned", url: "/admin/adminForreturn", icon: Package },
+  { title: "Assessment", url: "/admin/adminAssessment", icon: ClipboardCheck },
+  { title: "Job Order", url: "/admin/adminJoborder", icon: Search },
+  { title: "Returned", url: "/admin/adminReturned", icon: Package },
   { title: "Completed", url: "/admin/adminCompleted", icon: CheckCircle },
-];
-
-const accountItems = [
   { title: "Payments", url: "/admin/adminPayments", icon: CreditCard },
   { title: "Branch", url: "/admin/adminBranch", icon: User },
 ];
+
+
+
+// const branchItems = [
+//   { title: "Dashboard", url: "/branch/branchDashboard", icon: Home },
+//   { title: "Add Shoes", url: "/branch/branchAddshoes", icon: Inbox },
+//   { title: "Shipped Shoes", url: "/branch/branchShippedshoes", icon: ClipboardCheck },
+//   { title: "Returned", url: "/branch/branchReturned", icon: Search },
+//   { title: "Completed", url: "/branch/branchCompleted", icon: CheckCircle },
+// ];
 
 const logout = () => {
   router.post('/logout');
@@ -68,11 +75,12 @@ const logout = () => {
             </SidebarMenu>
           </SidebarGroupContent>
 
-          <!-- Account Section -->
-          <SidebarGroup class="pb-4 border-t">
+
+          <!-- Branch Section (Newly Added) -->
+          <!-- <SidebarGroup class="pb-4 border-t">
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem v-for="item in accountItems" :key="item.title">
+                <SidebarMenuItem v-for="item in branchItems" :key="item.title">
                   <SidebarMenuButton
                     asChild
                     class="px-3 py-2 text-lg font-semibold text-gray-800 hover:bg-gray-100 rounded-lg"
@@ -85,7 +93,7 @@ const logout = () => {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup>
+          </SidebarGroup> -->
 
           <!-- Log Out Section -->
           <SidebarGroup class="mt-32 pb-4 border-t">

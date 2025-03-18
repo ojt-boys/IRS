@@ -9,9 +9,14 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 
-const title = "Incoming Shoes";
+// Modal state
+const showModal = ref(false); // To control the visibility of the modal
+const ReturnedShoes = ref([ 
+  { id: 1, name: "Nike Air Max", shoeId: "AM123", dateTime: "2025-03-07 14:30" },
+  { id: 2, name: "Adidas UltraBoost", shoeId: "UB456", dateTime: "2025-03-07 16:00" },
+  { id: 3, name: "Puma RS-X", shoeId: "RS789", dateTime: "2025-03-07 18:45" },
+]);
 
-// Sample table data
 const tableData = ref([
   { id: 1, branch: "101", status: "In Transit", service: "Repair", dateTime: "2025-03-07 14:30" },
   { id: 2, branch: "203", status: "To Ship", service: "Customization", dateTime: "2025-03-07 16:00" },
@@ -21,14 +26,6 @@ const tableData = ref([
 const searchQuery = ref("");
 const sortKey = ref("");
 const sortOrder = ref(1); // 1 = ascending, -1 = descending
-
-// Modal state and data
-const showModal = ref(false);
-const incomingShoes = ref([
-  { shoeId: 1, name: "Nike Air Max", dateTime: "2025-03-07 14:30" },
-  { shoeId: 2, name: "Adidas UltraBoost", dateTime: "2025-03-07 16:00" },
-  { shoeId: 3, name: "Puma RS-X", dateTime: "2025-03-07 18:45" },
-]);
 
 // Computed filtered and sorted data
 const filteredTableData = computed(() => {
@@ -66,7 +63,7 @@ const statusColor = (status: string) => {
   return "bg-gray-300 text-black";
 };
 
-// Open the modal
+// Open the modal when the "Details" button is clicked
 const openModal = () => {
   showModal.value = true;
 };
@@ -85,12 +82,12 @@ const closeModal = () => {
 
       <!-- Main Content Area -->
       <div class="flex flex-col flex-1 w-full">
-        <Head :title="title" />
+        <Head :title="'Returned Shoes'" />
 
         <header class="bg-white dark:bg-gray-800 shadow px-6 h-20 flex items-center justify-center relative">
           <SidebarTrigger class="text-gray-500 dark:text-gray-400 absolute left-6" />
           <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 w-full text-center">
-            {{ title }}
+            Returned Shoes
           </div>
         </header>
 
@@ -133,12 +130,13 @@ const closeModal = () => {
       </div>
     </div>
 
-    <!-- Modal for showing list of incoming shoes -->
+
     <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
-        <div class="text-center font-semibold text-lg mb-4">List of Incoming Shoes</div>
+        <div class="text-center font-semibold text-lg mb-4">List of Returned Shoes</div>
         
-        <!-- List of incoming shoes -->
+
+
         <Table class="w-full border rounded-lg">
           <TableHeader>
             <TableRow class="bg-gray-200 dark:bg-gray-700">
@@ -148,7 +146,7 @@ const closeModal = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="shoe in incomingShoes" :key="shoe.shoeId" class="border-b last:border-b-0">
+            <TableRow v-for="shoe in ReturnedShoes" :key="shoe.id" class="border-b last:border-b-0">
               <TableCell class="px-4 py-2">{{ shoe.shoeId }}</TableCell>
               <TableCell class="px-4 py-2">{{ shoe.name }}</TableCell>
               <TableCell class="px-4 py-2">{{ shoe.dateTime }}</TableCell>

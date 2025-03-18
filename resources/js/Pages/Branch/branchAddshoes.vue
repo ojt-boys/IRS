@@ -6,19 +6,17 @@ import { ref, computed } from "vue";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import BarChart from "@/Components/BarChart.vue";
-import GaugeChart from "@/Components/GaugeChart.vue";
 
-// Modal state and shoe details
+// Modal state and new shoe details
 const modalOpen = ref(false);
-const selectedShoeDetails = ref({
-  name: '',
-  brand: '',
-  description: '',
-  picture: '', // Placeholder for the shoe image URL
+const newShoe = ref({
+  shoeId: '',
+  branchNo: '',
+  service: '',
+  payment: ''
 });
 
-const title = "Dashboard";
+const title = "Branch Add Shoes";
 
 // Sample table data
 const tableData = ref([
@@ -56,36 +54,22 @@ const sortTable = (key: string) => {
   }
 };
 
-// Sample chart data
-const profitsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [4000, 3000, 2000, 2780, 1890, 2390],
-});
-
-const ordersData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 1398, 9800, 3908, 4800, 3800],
-});
-
-const earningsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 2210, 2290, 2000, 2181, 2500],
-});
-
-// Open modal function with static sample shoe data
-const showModal = (shoe: any) => {
-  selectedShoeDetails.value = {
-    name: "Air Max 97",  // Example static shoe name
-    brand: "Nike",       // Example static brand
-    description: "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
-    picture: "https://via.placeholder.com/150", // Placeholder image URL
-  };
+// Open modal function
+const openAddShoeModal = () => {
   modalOpen.value = true;
 };
 
-// Close modal
+// Close modal function
 const closeModal = () => {
   modalOpen.value = false;
+};
+
+// Handle form submission
+const submitNewShoe = () => {
+  // Logic to add the new shoe
+  // For example, send this to an API or store it in your local table data
+  console.log("New Shoe Details:", newShoe.value);
+  closeModal();
 };
 </script>
 
@@ -103,24 +87,9 @@ const closeModal = () => {
         </header>
         <main class="flex-1 p-6 w-full">
 
-          <!-- Stats Section (Orders & Profits) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
-              <h2 class="text-sm text-gray-500 dark:text-gray-400">Orders</h2>
-              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">2,560</p>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
-              <h2 class="text-sm text-gray-500 dark:text-gray-400">Profits</h2>
-              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">$6,250</p>
-            </div>
-          </div>
-
-          <!-- Charts Section (3 Bar Charts) -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <GaugeChart title="Profits" :value="6250" :max="10000" />
-            <BarChart title="Orders" :chartData="ordersData" color="#82ca9d" />
-            <BarChart title="Earnings" :chartData="earningsData" color="#ffc658" />
+          <!-- Add Shoe Button -->
+          <div class="flex justify-end mb-4">
+            <Button @click="openAddShoeModal" variant="outline" size="sm">Add New Shoe</Button>
           </div>
 
           <!-- Search & Table Section -->
@@ -145,7 +114,7 @@ const closeModal = () => {
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
                   <TableCell class="px-4 py-2">
-                    <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
+                    <Button @click="openAddShoeModal" size="sm" variant="outline">Add Shoe</Button>
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -154,32 +123,36 @@ const closeModal = () => {
 
         </main>
 
-        <!-- Modal for Shoe Details -->
+        <!-- Modal for Add Shoe -->
         <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
           <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Add New Shoe</h2>
               <Button @click="closeModal" size="sm" variant="outline">Close</Button>
             </div>
-            <div>
-              <div class="mb-4">
-                <strong class="text-gray-600 dark:text-gray-300">Shoe Name:</strong>
-                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.name }}</p>
+
+            <!-- Add Shoe Form -->
+            <div class="space-y-4">
+              <div>
+                <label for="shoeId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Shoe ID</label>
+                <Input id="shoeId" v-model="newShoe.shoeId" type="text" placeholder="Enter Shoe ID" />
               </div>
-              <div class="mb-4">
-                <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
-                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
+              <div>
+                <label for="branchNo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Branch No.</label>
+                <Input id="branchNo" v-model="newShoe.branchNo" type="text" placeholder="Enter Branch No." />
               </div>
-              <div class="mb-4">
-                <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
-                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.description }}</p>
+              <div>
+                <label for="service" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Service</label>
+                <Input id="service" v-model="newShoe.service" type="text" placeholder="Enter Service" />
               </div>
-              <div class="mb-4">
-                <strong class="text-gray-600 dark:text-gray-300">Picture:</strong>
-                <div class="flex justify-center items-center h-48 bg-gray-200 dark:bg-gray-700">
-                  <img :src="selectedShoeDetails.picture" alt="Shoe Image" class="max-h-full max-w-full" />
-                </div>
+              <div>
+                <label for="payment" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Payment</label>
+                <Input id="payment" v-model="newShoe.payment" type="text" placeholder="Enter Payment Status" />
               </div>
+            </div>
+
+            <div class="flex justify-end mt-4">
+              <Button @click="submitNewShoe" variant="outline" color="green">Submit</Button>
             </div>
           </div>
         </div>
