@@ -63,28 +63,110 @@ const earningsData = ref({
   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   data: [2400, 2210, 2290, 2000, 2181, 2500],
 });
+
+// Modal data and visibility
+const showModal = ref(false);
+const selectedItem = ref(null);
+
+
+
+const openModal = (item: any) => {
+  selectedItem.value = item;
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  selectedItem.value = null;
+};
+
+
 </script>
 
 <template>
   <SidebarProvider>
-    <div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      <!-- Sidebar -->
-      <AppSidebar class="bg-white w-64 min-h-screen" />
-
-      
-      <!-- Main Content -->
-      <div class="flex-1 flex flex-col">
-
-       
-        
-        <header class="bg-white dark:bg-gray-800 shadow px-6 py-4 flex items-center justify-between w-full">
-          <SidebarTrigger class="text-gray-500 dark:text-gray-400" />
-          <h1>Welcome to the Admin Dashboard</h1>
-
+    <div class="flex min-h-screen w-full bg-gray-100 dark:bg-gray-900">
+      <AppSidebar class="shrink-0" />
+      <div class="flex flex-col flex-1 w-full">
+        <Head :title="title" />
+        <header class="bg-white dark:bg-gray-800 shadow px-6 h-20 flex items-center justify-center relative">
+          <SidebarTrigger class="text-gray-500 dark:text-gray-400 absolute left-6" />
+          <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 w-full text-center">
+            {{ title }}
+          </div>
         </header>
+        <main class="flex-1 p-6 w-full">
 
-        <main class="p-6">
-          <p class="text-gray-700">Dashboard Content Goes Here</p>
+          <!-- Stats Section (Orders & Profits) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
+              <h2 class="text-sm text-gray-500 dark:text-gray-400">Orders</h2>
+              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">2,560</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
+              <h2 class="text-sm text-gray-500 dark:text-gray-400">Profits</h2>
+              <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">$6,250</p>
+            </div>
+          </div>
+
+          <!-- Charts Section (3 Bar Charts) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <GaugeChart title="Profits" :value="6250" :max="10000" />
+            <BarChart title="Orders" :chartData="ordersData" color="#82ca9d" />
+            <BarChart title="Earnings" :chartData="earningsData" color="#ffc658" />
+          </div>
+
+          <!-- Search & Table Section -->
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
+            <Input v-model="searchQuery" placeholder="Search..." class="mb-4 w-full" />
+            <Table class="w-full border rounded-lg">
+              <TableHeader>
+                <TableRow class="bg-gray-200 dark:bg-gray-700">
+                  <TableHead @click="sortTable('id')" class="cursor-pointer px-4 py-2">Shoe ID</TableHead>
+                  <TableHead @click="sortTable('branch')" class="cursor-pointer px-4 py-2">Branch No.</TableHead>
+                  <TableHead @click="sortTable('status')" class="cursor-pointer px-4 py-2">Status</TableHead>
+                  <TableHead @click="sortTable('service')" class="cursor-pointer px-4 py-2">Service</TableHead>
+                  <TableHead @click="sortTable('payment')" class="cursor-pointer px-4 py-2">Payment</TableHead>
+                  <TableHead class="px-4 py-2">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
+                  <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.status }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2">
+                    <Button size="sm" variant="outline" @click="openModal(item)">Details</Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+
+          <!-- Modal (Pop-up) -->
+          <div v-if="showModal" class="fixed inset-0 z-50 flex justify-center items-center bg-gray-800 bg-opacity-50">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+              <div class="text-center">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h3>
+                <div class="mt-4">
+                  <p><strong>ID:</strong> {{ selectedItem.id }}</p>
+                  <p><strong>Branch:</strong> {{ selectedItem.branch }}</p>
+                  <p><strong>Status:</strong> {{ selectedItem.status }}</p>
+                  <p><strong>Service:</strong> {{ selectedItem.service }}</p>
+                  <p><strong>Payment:</strong> {{ selectedItem.payment }}</p>
+                </div>
+                <div class="mt-6">
+                  <Button @click="closeModal" class="w-full">Close</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
         </main>
       </div>
     </div>
