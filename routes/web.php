@@ -53,10 +53,33 @@ Route::middleware([
             'branchCompleted',
         ];
 
-        foreach ($branchRoutes as $route) {
-            Route::get("/$route", [BranchController::class, $route])->name("branch.$route");
-        }
-    });
+    Route::get('/admin/adminForchecking', function () {
+        return Inertia::render('Admin/adminForchecking'); 
+    })->name('admin.adminForchecking');
+
+    Route::get('/admin/adminStatus', function () {
+        return Inertia::render('Admin/adminStatus'); 
+    })->name('admin.adminStatus');
+
+
+    Route::get('/admin/adminForreturn', function () {
+        return Inertia::render('Admin/adminForreturn'); 
+    })->name('admin.adminForreturn');
+
+
+
+    Route::get('/admin/adminCompleted', function () {
+        return Inertia::render('Admin/adminCompleted'); 
+    })->name('admin.adminCompleted');
+
+    Route::get('/admin/adminPayments', function () {
+        return Inertia::render('Admin/adminPayments'); 
+    })->name('admin.adminPayments');
+
+    Route::get('/admin/adminBranch', function () {
+        return Inertia::render('Admin/adminBranch'); 
+    })->name('admin.adminBranch');
+  
 
 });
 

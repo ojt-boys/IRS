@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
+
+import { ref } from "vue";
 import { 
   Home, Inbox, CheckCircle, Search, 
   RotateCw, Package, ClipboardCheck, CreditCard, 
@@ -22,13 +23,25 @@ import {
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 
-// Sidebar Items for Admin and Branch
+const activeItem = ref<string | null>(null);
+
+const toggleSubmenu = (title: string) => {
+  activeItem.value = activeItem.value === title ? null : title; // Toggle the visibility of submenu
+};
+
 const items = [
   { title: "Dashboard", url: "/admin/adminDashboard", icon: Home },
   { title: "Incoming", url: "/admin/adminIncoming", icon: Inbox },
-  { title: "Assesment", url: "/admin/adminAssessment", icon: ClipboardCheck },
-  { title: "Job Order", url: "/admin/adminJoborder", icon: Search },
-  { title: "Returned", url: "/admin/adminReturned", icon: Package },
+  { title: "For Checking", url: "/admin/adminForchecking", icon: ClipboardCheck },
+  { 
+    title: "Status", icon: Search, 
+    subItems: [
+      { title: "Repairing", icon: Wrench, url: "/admin/adminStatusrepairing" },
+      { title: "Failed", icon: XCircle, url: "/admin/adminStatusfailed" },
+    ]
+  },
+  { title: "Refund", url: "/admin/adminRefund", icon: RotateCw },
+  { title: "For Return", url: "/admin/adminForreturn", icon: Package },
   { title: "Completed", url: "/admin/adminCompleted", icon: CheckCircle },
 ];
 
@@ -71,37 +84,23 @@ const logout = () => {
 
           <SidebarGroupContent class="flex-1 overflow-auto">
             <SidebarMenu>
-              <!-- Conditionally render items based on isAdminRoute or isBranchRoute -->
-              <SidebarMenuItem 
-                v-for="item in (isAdminRoute ? items : [])" 
-                :key="item.title"
-              >
+              <!-- Loop through all items -->
+              <SidebarMenuItem v-for="item in items" :key="item.title">
+                <!-- Main Item Button -->
                 <SidebarMenuButton
                   asChild
                   class="px-3 py-2 text-lg font-semibold text-gray-800 hover:bg-gray-100 rounded-lg"
                 >
-                  <!-- Use the Link component from Inertia -->
-                  <Link :href="item.url" class="flex items-center gap-3">
+                  <!-- Link for all items that are not 'Status' -->
+                  <a v-if="!item.subItems" :href="item.url" class="flex items-center gap-3">
                     <component :is="item.icon" class="w-5 h-5 text-gray-600" />
                     <span>{{ item.title }}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <!-- Optionally render branchItems when the route is for branch -->
-              <SidebarMenuItem 
-                v-for="item in (isBranchRoute ? branchItems : [])" 
-                :key="item.title"
-              >
-                <SidebarMenuButton
-                  asChild
-                  class="px-3 py-2 text-lg font-semibold text-gray-800 hover:bg-gray-100 rounded-lg"
-                >
-                  <!-- Use the Link component from Inertia for branch routes -->
-                  <Link :href="item.url" class="flex items-center gap-3">
+                  </a>
+                  <!-- For 'Status' with a dropdown toggle -->
+                  <div v-else class="flex items-center gap-3">
                     <component :is="item.icon" class="w-5 h-5 text-gray-600" />
                     <span>{{ item.title }}</span>
-                  </Link>
+                  </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

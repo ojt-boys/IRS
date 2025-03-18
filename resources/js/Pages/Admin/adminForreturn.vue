@@ -6,19 +6,21 @@ import { ref, computed } from "vue";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { ChevronDown, ChevronRight } from "lucide-vue-next";
+import { ChevronDown, ChevronRight, ArrowUp, ArrowDown } from "lucide-vue-next";
 
-const title = "Payments";
+const title = "For Return";
 
 const tableData = ref([
-  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "Unpaid", dateTime: "2025-03-07 14:30" },
-  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "Unpaid", dateTime: "2025-03-07 16:00" },
-  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Paid", dateTime: "2025-03-07 18:45" },
-  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Paid", dateTime: "2025-03-08 10:15" },
+  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "In Transit", dateTime: "2025-03-07 14:30" },
+  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "To Ship", dateTime: "2025-03-07 16:00" },
+  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Returned", dateTime: "2025-03-07 18:45" },
+  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Returned", dateTime: "2025-03-08 10:15" },
+  { batch: 2, id: 5, branch: "204", service: "Waterproofing", shoe: "New Balance 574", status: "In Transit", dateTime: "2025-03-08 12:45" },
 ]);
 
 const searchQuery = ref("");
 const expandedBatches = ref<number[]>([]);
+const sortedBatches = ref<Record<number, { column: string; order: "asc" | "desc" }>>({});
 
 const filteredTableData = computed(() => {
   if (!searchQuery.value) return tableData.value;
@@ -42,14 +44,12 @@ const toggleBatch = (batch: number) => {
 };
 
 const getStatusClass = (status: string) => {
-  return status === "Unpaid" ? "bg-yellow-500 text-black" :
-         status === "Paid" ? "bg-green-500 text-white" :
+  return status === "In Transit" ? "bg-orange-500 text-white" :
+         status === "To Ship" ? "bg-yellow-500 text-black" :
+         status === "Returned" ? "bg-green-500 text-white" :
          "bg-gray-300 text-black";
 };
 </script>
-
-
-
 
 <template>
   <SidebarProvider>
@@ -114,17 +114,6 @@ const getStatusClass = (status: string) => {
             </Table>
           </div>
         </main>
-      </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <div class="text-xl mb-4">{{ modalMessage }}</div>
-        <div class="flex justify-end space-x-4">
-          <Button @click="closeModal" variant="outline">No</Button>
-          <Button @click="confirmAction" variant="primary">Yes</Button>
-        </div>
       </div>
     </div>
   </SidebarProvider>

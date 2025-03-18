@@ -9,14 +9,9 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 
-// Modal state
-const showModal = ref(false); // To control the visibility of the modal
-const incomingShoes = ref([ // Static data for the list of incoming shoes
-  { id: 1, name: "Nike Air Max", shoeId: "AM123", dateTime: "2025-03-07 14:30" },
-  { id: 2, name: "Adidas UltraBoost", shoeId: "UB456", dateTime: "2025-03-07 16:00" },
-  { id: 3, name: "Puma RS-X", shoeId: "RS789", dateTime: "2025-03-07 18:45" },
-]);
+const title = "Incoming Shoes";
 
+// Sample table data
 const tableData = ref([
   { id: 1, branch: "101", status: "In Transit", service: "Repair", dateTime: "2025-03-07 14:30" },
   { id: 2, branch: "203", status: "To Ship", service: "Customization", dateTime: "2025-03-07 16:00" },
@@ -62,16 +57,6 @@ const statusColor = (status: string) => {
   if (status === "Delivered") return "bg-green-500 text-white";
   return "bg-gray-300 text-black";
 };
-
-// Open the modal when the "Details" button is clicked
-const openModal = () => {
-  showModal.value = true;
-};
-
-// Close the modal
-const closeModal = () => {
-  showModal.value = false;
-};
 </script>
 
 <template>
@@ -82,18 +67,19 @@ const closeModal = () => {
 
       <!-- Main Content Area -->
       <div class="flex flex-col flex-1 w-full">
-        <Head :title="'Incoming Shoes'" />
+        <Head :title="title" />
 
         <header class="bg-white dark:bg-gray-800 shadow px-6 h-20 flex items-center justify-center relative">
           <SidebarTrigger class="text-gray-500 dark:text-gray-400 absolute left-6" />
           <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 w-full text-center">
-            Incoming Shoes
+            {{ title }}
           </div>
         </header>
 
         <!-- Main Content -->
         <main class="flex-1 p-6 w-full">
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            
             
             <!-- Search Input -->
             <Input v-model="searchQuery" placeholder="Search..." class="mb-4 w-full" />
@@ -106,6 +92,7 @@ const closeModal = () => {
                   <TableHead @click="sortTable('branch')" class="cursor-pointer px-4 py-2">Branch No.</TableHead>
                   <TableHead @click="sortTable('service')" class="cursor-pointer px-4 py-2">Service</TableHead>
                   <TableHead @click="sortTable('dateTime')" class="cursor-pointer px-4 py-2">Date & Time</TableHead>
+            
                   <TableHead class="px-4 py-2">Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -120,7 +107,7 @@ const closeModal = () => {
                     </span>
                   </TableCell>
                   <TableCell class="px-4 py-2">
-                    <Button size="sm" variant="outline" @click="openModal">Details</Button>
+                    <Button size="sm" variant="outline">Details</Button>
                   </TableCell>
                 </TableRow>
               </TableBody>
