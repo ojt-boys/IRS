@@ -21,10 +21,17 @@ const title = "Branch Dashboard";
 
 // Sample table data
 const tableData = ref([
-  { id: 1, branch: "101", status: "Incoming", service: "Repair", payment: "Pending" },
-  { id: 2, branch: "203", status: "For Checking", service: "Customization", payment: "Paid" },
-  { id: 3, branch: "305", status: "Completed", service: "Cleaning", payment: "Paid" },
+  { id: 1, branch: "101", status: "To Shipped", service: "Repair", payment: "Gcash" },
+  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Cash" },
+  { id: 3, branch: "305", status: "Received", service: "Cleaning", payment: "Cash" },
 ]);
+
+const statusColor = (status: string) => {
+  if (status === "To Shipped") return "bg-yellow-500 text-white";
+  if (status === "In Transit") return "bg-orange-500 text-white";
+  if (status === "Received") return "bg-green-500 text-white";
+  return "bg-gray-300 text-black";
+};
 
 const searchQuery = ref("");
 const sortKey = ref("");
@@ -70,6 +77,12 @@ const showModal = (shoe: any) => {
 const closeModal = () => {
   modalOpen.value = false;
 };
+
+
+
+
+
+
 </script>
 
 <template>
@@ -105,7 +118,9 @@ const closeModal = () => {
                 <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
                   <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
-                  <TableCell class="px-4 py-2">{{ item.status }}</TableCell>
+                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span></TableCell>
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
                   <TableCell class="px-4 py-2">

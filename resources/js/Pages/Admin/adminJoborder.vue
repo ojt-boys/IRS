@@ -22,13 +22,17 @@ const tableData = ref([
 const searchQuery = ref("");
 const activeBatch = ref<number | null>(null);
 const sortedBatches = ref<Record<number, { column: string; order: "asc" | "desc" }>>({});
-  const declineReason = ref('');
-  const isDeclinePopup = ref(false); 
+const declineReason = ref('');
+const isDeclinePopup = ref(false); 
 
 // Modal states
 const showModal = ref(false); // Controls visibility of the modal
 const modalMessage = ref(''); // The message to be displayed in the modal
 const currentItem = ref<any>(null); // The item that's currently being viewed for confirmation
+
+// Confirmation modal for Mark as Done or Returned actions
+const showConfirmationModal = ref(false); // Modal visibility
+const confirmationMessage = ref(''); // Action message
 
 // Modal for shoe details
 const showDetailsModal = ref(false);
@@ -50,15 +54,19 @@ const uniqueBatches = computed(() => {
   return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
 });
 
-// Sorting logic
-const sortBatchContents = (batch: number, column: string) => {
-  if (sortedBatches.value[batch]?.column === column) {
-    sortedBatches.value[batch].order = sortedBatches.value[batch].order === "asc" ? "desc" : "asc";
-  } else {
-    sortedBatches.value[batch] = { column, order: "asc" };
-  }
+// Mark as Done action
+const markAsDone = (item: any) => {
+  console.log("Mark as Done clicked for", item);
+  item.status = "Completed";  // Example: Update the status to 'Completed'
 };
 
+// Returned action
+const returnItem = (item: any) => {
+  console.log("Returned clicked for", item);
+  item.status = "Returned";  // Example: Update the status to 'Returned'
+};
+
+// Get sorted items within a batch
 const getSortedBatchItems = (batch: number) => {
   const batchItems = filteredTableData.value.filter(item => item.batch === batch);
   const sorting = sortedBatches.value[batch];
@@ -92,36 +100,34 @@ const goBackToBatches = () => {
   activeBatch.value = null;
 };
 
-const openConfirmationModal = (item: any) => {
+// Show confirmation modal for Mark as Done
+const confirmMarkAsDone = (item: any) => {
   currentItem.value = item;
-  if (item.status === "Repairing") {
-    modalMessage.value = "Are you sure the shoe is Repaired?";
-    isDeclinePopup.value = false;
-  } else if (item.status === "Repaired") {
-    modalMessage.value = "Are you sure you want to send it to Returned?";
-    isDeclinePopup.value = false;
-  } else if (item.status === "Failed") {
-    modalMessage.value = "Are you sure you want to refund it?";
-    isDeclinePopup.value = true; // Show input for decline reason
-  }
-  showModal.value = true;
+  confirmationMessage.value = "Mark as Done";
+  showConfirmationModal.value = true;
 };
 
-const closeModal = () => {
-  showModal.value = false;
-  currentItem.value = null;
-  declineReason.value = ''; // Reset decline reason
+// Show confirmation modal for Returned
+const confirmReturnItem = (item: any) => {
+  currentItem.value = item;
+  confirmationMessage.value = "Return";
+  showConfirmationModal.value = true;
 };
 
+// Close the confirmation modal
+const closeConfirmationModal = () => {
+  showConfirmationModal.value = false;
+  currentItem.value = null; // Reset the current item
+};
+
+// Perform action after confirmation
 const confirmAction = () => {
-  console.log(`Action confirmed for item ID: ${currentItem.value.id}`);
-  if (isDeclinePopup.value && !declineReason.value.trim()) {
-    alert('Please provide a reason for the decline.');
-  } else {
-    // Perform the actual action (Accept/Decline/Refund, etc.)
-    console.log(`Action for ${currentItem.value.id} is confirmed.`);
-    closeModal();
+  if (confirmationMessage.value === "Mark as Done") {
+    markAsDone(currentItem.value);
+  } else if (confirmationMessage.value === "Return") {
+    returnItem(currentItem.value);
   }
+  closeConfirmationModal(); // Close the modal after action
 };
 
 // Show shoe details in modal
@@ -135,6 +141,7 @@ const closeDetailsModal = () => {
   showDetailsModal.value = false;
 };
 </script>
+
 
 <template>
   <SidebarProvider>
@@ -184,7 +191,7 @@ const closeDetailsModal = () => {
               <Button @click="goBackToBatches" class="mb-4">Back</Button>
               <Table class="w-full border rounded-lg">
                 <TableHeader>
-                  <TableRow class="bg-gray-200 dark:bg-gray-700">
+                  <TableRow class="bg-gray-200 dark:bg-gray-700 w-full">
                     <TableHead class="px-4 py-2 text-left">Batch</TableHead>
                     <TableHead class="px-4 py-2 text-center">Shoe</TableHead>
                     <TableHead class="px-4 py-2 text-center">Service</TableHead>
@@ -210,7 +217,16 @@ const closeDetailsModal = () => {
                       </TableCell>
                       <TableCell class="px-4 py-2 text-center">
                         <Button size="sm" variant="outline" @click="showShoeDetails(item)">Details</Button>
-                        <Button size="sm" variant="outline" @click="openConfirmationModal(item)">Accept/Decline</Button>
+                      </TableCell>
+                      <TableCell>
+                        <!-- Mark as Done button, shown when status is 'Repaired' -->
+                        <div v-if="item.status === 'Repaired'">
+                          <Button size="sm" variant="outline" @click="confirmMarkAsDone(item)">Mark as Done</Button>
+                        </div>
+                        <!-- Returned button, shown when status is 'Failed' -->
+                        <div v-if="item.status === 'Failed'">
+                          <Button size="sm" variant="outline" @click="confirmReturnItem(item)">Returned</Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   </template>
@@ -239,32 +255,20 @@ const closeDetailsModal = () => {
     </div>
 
     <!-- Confirmation Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            {{ modalMessage }}
-          </h2>
-          <Button @click="closeModal" size="sm" variant="outline">Close</Button>
-        </div>
-        
-        <!-- Decline Reason Input -->
-        <div v-if="isDeclinePopup">
-          <Input v-model="declineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
-        </div>
-
-        <div class="flex justify-between">
-          <Button @click="closeModal" class="bg-gray-500 text-white hover:bg-gray-600">
-            Cancel
-          </Button>
-          <Button @click="confirmAction" class="bg-green-500 text-white hover:bg-green-600">
-            Confirm
-          </Button>
+    <div v-if="showConfirmationModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div class="text-xl mb-4">Confirm Action</div>
+        <p>Are you sure you want to {{ confirmationMessage }} this item?</p>
+        <div class="flex justify-end gap-4 mt-4">
+          <Button @click="closeConfirmationModal" variant="outline">Cancel</Button>
+          <Button @click="confirmAction" variant="danger">Confirm</Button>
         </div>
       </div>
     </div>
+
   </SidebarProvider>
 </template>
+
 
 
 

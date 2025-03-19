@@ -30,17 +30,16 @@ const items = [
   { title: "Completed", url: "/admin/adminCompleted", icon: CheckCircle },
   { title: "Payments", url: "/admin/adminPayments", icon: CreditCard },
   { title: "Branch", url: "/admin/adminBranch", icon: User },
+  
 ];
 
 
 
-// const branchItems = [
-//   { title: "Dashboard", url: "/branch/branchDashboard", icon: Home },
-//   { title: "Add Shoes", url: "/branch/branchAddshoes", icon: Inbox },
-//   { title: "Shipped Shoes", url: "/branch/branchShippedshoes", icon: ClipboardCheck },
-//   { title: "Returned", url: "/branch/branchReturned", icon: Search },
-//   { title: "Completed", url: "/branch/branchCompleted", icon: CheckCircle },
-// ];
+const branchItems = [
+
+  { title: "Add Shoes", url: "/branch/branchAddshoes", icon: Inbox },
+  { title: "Shipped Shoes", url: "/branch/branchShippedshoes", icon: ClipboardCheck },
+];
 
 const logout = () => {
   router.post('/logout');
@@ -77,7 +76,7 @@ const logout = () => {
 
 
           <!-- Branch Section (Newly Added) -->
-          <!-- <SidebarGroup class="pb-4 border-t">
+           <SidebarGroup class="pb-4 border-t">
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem v-for="item in branchItems" :key="item.title">
@@ -93,7 +92,7 @@ const logout = () => {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> -->
+          </SidebarGroup> 
 
           <!-- Log Out Section -->
           <SidebarGroup class="mt-32 pb-4 border-t">

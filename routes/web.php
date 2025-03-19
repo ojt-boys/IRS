@@ -36,6 +36,8 @@ Route::middleware([
             'adminCompleted',
             'adminPayments',
             'adminBranch',
+            'branchAddshoes',
+            'branchShippedshoes',
         ];
 
         foreach ($adminRoutes as $route) {

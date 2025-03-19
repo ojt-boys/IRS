@@ -72,7 +72,7 @@ const closeModal = () => {
 
 
 const statusColor = (status: string) => {
-  if (status === "Unpaid") return "bg-yellow-500 text-black";
+  if (status === "Unpaid") return "bg-yellow-300 text-black";
   if (status === "Refund") return "bg-orange-500 text-black";
   if (status === "Paid") return "bg-green-500 text-white";
   return "bg-gray-300 text-black";
