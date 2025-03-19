@@ -20,31 +20,50 @@ const selectedShoeDetails = ref({
 
 const title = "Dashboard";
 
-// Sample table data
-const tableData = ref([
-  { id: 1, branch: "101", status: "Incoming", service: "Repair", payment: "Pending" },
-  { id: 2, branch: "203", status: "For Checking", service: "Customization", payment: "Paid" },
-  { id: 3, branch: "305", status: "Completed", service: "Cleaning", payment: "Paid" },
+// Sample table data for Admin (for the repair shop)
+const adminTableData = ref([
+  { id: 1, branch: "101", status: "Failed", service: "Repair", payment: "Unpaid" },
+  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Paid" },
+  { id: 3, branch: "305", status: "To Shipped", service: "Cleaning", payment: "Paid" },
+  { id: 3, branch: "405", status: "Back Job", service: "Cleaning", payment: "Paid" },
 ]);
 
+// Sample table data for Branch
+const branchTableData = ref([
+  { id: 1, status: "To Shipped", service: "Repair", payment: "Paid" },
+  { id: 2, status: "In Transit", service: "Customization", payment: "Paid" },
+  { id: 3, status: "Failed", service: "Cleaning", payment: "Unpaid" },
+]);
+
+// Filters and sorting
 const searchQuery = ref("");
 const sortKey = ref("");
 const sortOrder = ref(1);
 
-const filteredTableData = computed(() => {
-  let filtered = tableData.value.filter((item) =>
+const filteredAdminTableData = computed(() => {
+  return adminTableData.value.filter((item) =>
     Object.values(item).some((val) => String(val).toLowerCase().includes(searchQuery.value.toLowerCase()))
-  );
-
-  if (sortKey.value) {
-    filtered.sort((a, b) => {
+  ).sort((a, b) => {
+    if (sortKey.value) {
       const aValue = a[sortKey.value];
       const bValue = b[sortKey.value];
       return (aValue > bValue ? 1 : -1) * sortOrder.value;
-    });
-  }
+    }
+    return 0;
+  });
+});
 
-  return filtered;
+const filteredBranchTableData = computed(() => {
+  return branchTableData.value.filter((item) =>
+    Object.values(item).some((val) => String(val).toLowerCase().includes(searchQuery.value.toLowerCase()))
+  ).sort((a, b) => {
+    if (sortKey.value) {
+      const aValue = a[sortKey.value];
+      const bValue = b[sortKey.value];
+      return (aValue > bValue ? 1 : -1) * sortOrder.value;
+    }
+    return 0;
+  });
 });
 
 const sortTable = (key: string) => {
@@ -55,22 +74,6 @@ const sortTable = (key: string) => {
     sortOrder.value = 1;
   }
 };
-
-// Sample chart data
-const profitsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [4000, 3000, 2000, 2780, 1890, 2390],
-});
-
-const ordersData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 1398, 9800, 3908, 4800, 3800],
-});
-
-const earningsData = ref({
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  data: [2400, 2210, 2290, 2000, 2181, 2500],
-});
 
 // Open modal function with static sample shoe data
 const showModal = (shoe: any) => {
@@ -87,6 +90,36 @@ const showModal = (shoe: any) => {
 const closeModal = () => {
   modalOpen.value = false;
 };
+
+// Chart data
+const profitsData = ref({
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  data: [4000, 3000, 2000, 2780, 1890, 2390],
+});
+
+const ordersData = ref({
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  data: [2400, 1398, 9800, 3908, 4800, 3800],
+});
+
+const earningsData = ref({
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  data: [2400, 2210, 2290, 2000, 2181, 2500],
+});
+
+
+
+
+
+const statusColor = (status: string) => {
+  if (status === "To Shipped") return "bg-yellow-300 text-black";
+  if (status === "Back Job") return "bg-orange-500 text-white";
+  if (status === "In Transit") return "bg-green-500 text-white";
+  if (status === "Failed") return "bg-red-500 text-white";
+  return "bg-gray-300 text-black";
+};
+
+
 </script>
 
 <template>
@@ -123,9 +156,11 @@ const closeModal = () => {
             <BarChart title="Earnings" :chartData="earningsData" color="#ffc658" />
           </div>
 
-          <!-- Search & Table Section -->
+          <!-- Admin Table Section -->
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
-            <Input v-model="searchQuery" placeholder="Search..." class="mb-4 w-full" />
+            <div class="flex justify-between mb-4">
+              <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
+            </div>
             <Table class="w-full border rounded-lg">
               <TableHeader>
                 <TableRow class="bg-gray-200 dark:bg-gray-700">
@@ -138,10 +173,43 @@ const closeModal = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
+                <TableRow v-for="item in filteredAdminTableData" :key="item.id" class="border-b last:border-b-0">
                   <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
-                  <TableCell class="px-4 py-2">{{ item.status }}</TableCell>
+                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span></TableCell>
+                  <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2">
+                    <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          <!-- Branch Table Section -->
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
+            <div class="flex justify-between mb-4">
+              <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
+            </div>
+            <Table class="w-full border rounded-lg">
+              <TableHeader>
+                <TableRow class="bg-gray-200 dark:bg-gray-700">
+                  <TableHead @click="sortTable('id')" class="cursor-pointer px-4 py-2">Shoe ID</TableHead>
+                  <TableHead @click="sortTable('status')" class="cursor-pointer px-4 py-2">Status</TableHead>
+                  <TableHead @click="sortTable('service')" class="cursor-pointer px-4 py-2">Service</TableHead>
+                  <TableHead @click="sortTable('payment')" class="cursor-pointer px-4 py-2">Payment</TableHead>
+                  <TableHead class="px-4 py-2">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow v-for="item in filteredBranchTableData" :key="item.id" class="border-b last:border-b-0">
+                  <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
+                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span></TableCell>
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
                   <TableCell class="px-4 py-2">

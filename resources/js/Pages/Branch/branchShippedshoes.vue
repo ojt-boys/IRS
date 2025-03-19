@@ -1,17 +1,101 @@
 <script setup lang="ts">
 import AppSidebar from '@/Components/AppSidebar.vue';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
+import { Head } from '@inertiajs/vue3';
+import { ref, computed } from "vue";
+import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/Components/ui/table";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
+
+// Modal state and shoe details
+const modalOpen = ref(false);
+const selectedShoeDetails = ref({
+  name: '',
+  brand: '',
+  description: '',
+  picture: '', // Placeholder for the shoe image URL
+  status: '', // Default status
+});
 
 
-const title = "Branch Shipped Shoes";
+const title="Branch Shipped"
 
+// Sample table data
+const tableData = ref([
+  { id: 1, branch: "101", status: "To Shipped", service: "Repair", payment: "Unpaid" },
+  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Paid" },
+  { id: 3, branch: "305", status: "Received", service: "Cleaning", payment: "Paid" },
+]);
 
+const statusColor = (status: string) => {
+  if (status === "To Shipped") return "bg-yellow-300 text-black";
+  if (status === "In Transit") return "bg-orange-500 text-white";
+  if (status === "Received") return "bg-green-500 text-white";
+  return "bg-gray-300 text-black";
+};
+
+const searchQuery = ref("");
+const sortKey = ref("");
+const sortOrder = ref(1);
+
+const filteredTableData = computed(() => {
+  let filtered = tableData.value.filter((item) =>
+    Object.values(item).some((val) => String(val).toLowerCase().includes(searchQuery.value.toLowerCase()))
+  );
+
+  if (sortKey.value) {
+    filtered.sort((a, b) => {
+      const aValue = a[sortKey.value];
+      const bValue = b[sortKey.value];
+      return (aValue > bValue ? 1 : -1) * sortOrder.value;
+    });
+  }
+
+  return filtered;
+});
+
+const sortTable = (key: string) => {
+  if (sortKey.value === key) {
+    sortOrder.value *= -1;
+  } else {
+    sortKey.value = key;
+    sortOrder.value = 1;
+  }
+};
+
+// Open modal function with static sample shoe data for Details
+const showModal = (shoe: any) => {
+  selectedShoeDetails.value = {
+    name: "Air Max 97",  // Example static shoe name
+    brand: "Nike",       // Example static brand
+    description: "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
+    picture: "https://via.placeholder.com/150", // Placeholder image URL
+    status: shoe.status, // Shoe status (Logistics, Shipped, Delivered)
+  };
+  modalOpen.value = true;
+};
+
+// Close Details modal
+const closeModal = () => {
+  modalOpen.value = false;
+};
+
+// Function to get the progress bar style based on the current status
+const getStatusBarStyle = (currentStatus: string, targetStatus: string) => {
+  if (currentStatus === targetStatus) {
+    return 'width: 100%';
+  } else if (
+    (currentStatus === 'To Shipped' && targetStatus === 'In Transit') ||
+    (currentStatus === 'In Transit' && targetStatus === 'Received')
+  ) {
+    return 'width: 50%';
+  }
+  return 'width: 0%';
+};
 </script>
 
 <template>
-
-
-<SidebarProvider>
+  <SidebarProvider>
     <div class="flex min-h-screen w-full bg-gray-100 dark:bg-gray-900">
       <AppSidebar class="shrink-0" />
       <div class="flex flex-col flex-1 w-full">
@@ -22,16 +106,103 @@ const title = "Branch Shipped Shoes";
             {{ title }}
           </div>
         </header>
-        <main class="flex-1 p-6 w-full">
 
+        <main class="flex-1 p-6 w-full">
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
+            <div class="flex justify-between mb-4">
+              <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
+            </div>
+
+            <Table class="w-full border rounded-lg">
+              <TableHeader>
+                <TableRow class="bg-gray-200 dark:bg-gray-700">
+                  <TableHead @click="sortTable('id')" class="cursor-pointer px-4 py-2">Shoe ID</TableHead>
+                  <TableHead @click="sortTable('branch')" class="cursor-pointer px-4 py-2">Branch No.</TableHead>
+                  <TableHead @click="sortTable('status')" class="cursor-pointer px-4 py-2">Status</TableHead>
+                  <TableHead @click="sortTable('service')" class="cursor-pointer px-4 py-2">Service</TableHead>
+                  <TableHead @click="sortTable('payment')" class="cursor-pointer px-4 py-2">Payment</TableHead>
+                  <TableHead class="px-4 py-2">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
+                  <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
+                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span></TableCell>
+                  <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
+                  <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2">
+                    <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </main>
+
+        <!-- Modal for Shoe Details -->
+        <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
+              <Button @click="closeModal" size="sm" variant="outline">Close</Button>
+            </div>
+
+
+   <!-- Status Tracker (Logistics -> Shipped -> Delivered) -->
+
+            <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Status:</strong>
+                <div class="relative pt-4">
+                  <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                    <span>To Shipped</span>
+                    <span>In Transit</span>
+                    <span>Received</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'To Shipped')"></div>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'In Transit')"></div>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'Received')"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Shoe Name:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.name }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.description }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Picture:</strong>
+                <div class="flex justify-center items-center h-48 bg-gray-200 dark:bg-gray-700">
+                  <img :src="selectedShoeDetails.picture" alt="Shoe Image" class="max-h-full max-w-full" />
+                </div>
+              </div>
+
+              <!-- Status Tracker (Logistics -> Shipped -> Delivered) -->
+              
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-</SidebarProvider>
-
-
-
-
-
-
+  </SidebarProvider>
 </template>
