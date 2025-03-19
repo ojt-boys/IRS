@@ -29,7 +29,7 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('adminDashboard', absolute: false));
+    $response->assertRedirect(route('admin.adminDashboard', absolute: false));
 })->skip(function () {
     return ! Features::enabled(Features::registration());
 }, 'Registration support is not enabled.');
