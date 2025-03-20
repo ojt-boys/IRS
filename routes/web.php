@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BranchController;
+use App\Http\Middleware\RoleMiddleware;  // Import the middleware
 
 // Welcome page route
 Route::get('/', function () {
@@ -16,18 +17,23 @@ Route::get('/', function () {
     ]);
 });
 
-// Inside authenticated middleware group for both admin and branch routes
+// Inside authenticated middleware group
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/adminDashboard', [AdminController::class, 'adminDashboard'])->name('adminDashboard'); // Admin Dashboard route
+    // ✅ Admin Routes with Role Middleware
+    Route::prefix('admin')
+        ->name('admin.')
+        ->middleware(RoleMiddleware::class.':admin,super-admin')  // Apply middleware with roles
+        ->group(function () {
 
-        // Admin specific routes
+        Route::get('/adminDashboard', [AdminController::class, 'adminDashboard'])
+            ->name('adminDashboard');
+
+        // Admin-specific routes
         $adminRoutes = [
             'adminIncoming',
             'adminAssessment',
@@ -41,12 +47,17 @@ Route::middleware([
         ];
 
         foreach ($adminRoutes as $route) {
-            Route::get("/$route", [AdminController::class, $route])->name("admin.$route");
+            Route::get("/$route", [AdminController::class, $route])
+                ->name($route);
         }
     });
 
-    // Branch routes
-    Route::prefix('branch')->name('branch.')->group(function () {
+    // ✅ Branch Routes with Role Middleware
+    Route::prefix('branch')
+        ->name('branch.')
+        ->middleware(RoleMiddleware::class.':branch,super-admin')  // Apply middleware with roles
+        ->group(function () {
+
         $branchRoutes = [
             'branchDashboard',
             'branchAddshoes',
@@ -56,8 +67,9 @@ Route::middleware([
         ];
 
         foreach ($branchRoutes as $route) {
-            Route::get("/$route", [BranchController::class, $route])->name("branch.$route");
+            Route::get("/$route", [BranchController::class, $route])
+                ->name($route);
         }
     });
 
-}); 
+});
