@@ -22,14 +22,14 @@ import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 
 const items = [
-  { title: "Dashboard", url: "/admin/adminDashboard", icon: Home },
-  { title: "Incoming", url: "/admin/adminIncoming", icon: Inbox },
-  { title: "Assessment", url: "/admin/adminAssessment", icon: ClipboardCheck },
-  { title: "Job Order", url: "/admin/adminJoborder", icon: Search },
-  { title: "Returned", url: "/admin/adminReturned", icon: Package },
-  { title: "Completed", url: "/admin/adminCompleted", icon: CheckCircle },
-  { title: "Payments", url: "/admin/adminPayments", icon: CreditCard },
-  { title: "Branch", url: "/admin/adminBranch", icon: User },
+  { title: "Dashboard", url: "/admin/Dashboard", icon: Home },
+  { title: "Incoming", url: "/admin/Incoming", icon: Inbox },
+  { title: "Assessment", url: "/admin/Assessment", icon: ClipboardCheck },
+  { title: "Job Order", url: "/admin/Joborder", icon: Search },
+  { title: "Returned", url: "/admin/Returned", icon: Package },
+  { title: "Completed", url: "/admin/Completed", icon: CheckCircle },
+  { title: "Payments", url: "/admin/Payments", icon: CreditCard },
+  { title: "Branch", url: "/admin/Branch", icon: User },
   
 ];
 
@@ -37,8 +37,8 @@ const items = [
 
 const branchItems = [
 
-  { title: "Add Shoes", url: "/branch/branchAddshoes", icon: Inbox },
-  { title: "Shipped Shoes", url: "/branch/branchShippedshoes", icon: ClipboardCheck },
+  { title: "Add Shoes", url: "/branch/Addshoes", icon: Inbox },
+  { title: "Shipped Shoes", url: "/branch/Shippedshoes", icon: ClipboardCheck },
 ];
 
 const logout = () => {
