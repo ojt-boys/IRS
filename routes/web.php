@@ -24,7 +24,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
-    // Admin Routes with Role Middleware
+    // ✅ Admin Routes with Role Middleware
     Route::prefix('admin')
         ->name('admin.')
         ->middleware(RoleMiddleware::class.':admin,super-admin')  // Apply middleware with roles
@@ -52,10 +52,10 @@ Route::middleware([
         }
     });
 
-    // Branch Routes with Role Middleware
+    // ✅ Branch Routes with Role Middleware
     Route::prefix('branch')
         ->name('branch.')
-        ->middleware(RoleMiddleware::class.':branch')  // Apply middleware with roles
+        ->middleware(RoleMiddleware::class.':branch,super-admin')  // Apply middleware with roles
         ->group(function () {
 
         $branchRoutes = [
