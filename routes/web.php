@@ -55,7 +55,7 @@ Route::middleware([
     // Branch Routes with Role Middleware
     Route::prefix('branch')
         ->name('branch.')
-        ->middleware(RoleMiddleware::class.':branch,super-admin')  // Apply middleware with roles
+        ->middleware(RoleMiddleware::class.':branch')  // Apply middleware with roles
         ->group(function () {
 
         $branchRoutes = [
