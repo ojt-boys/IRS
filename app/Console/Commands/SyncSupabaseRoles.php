@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 
 class SyncSupabaseRoles extends Command
 {
-    protected $signature = 'sync:supabase-roles';  // Ensure this is correct
+    protected $signature = 'sync:supabase-roles';  // ✅ Ensure this is correct
     protected $description = 'Sync roles and permissions from Supabase to Spatie';
 
     public function handle()
