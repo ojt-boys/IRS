@@ -37,11 +37,6 @@ class CreateNewUser implements CreatesNewUsers
                 $this->createTeam($user);
             });
         });
-
-        // Assign default role or custom role during registration
-        $user->assignRole($input['role'] ?? 'branch');  // Default role
-
-        return $user;
     }
 
     /**
