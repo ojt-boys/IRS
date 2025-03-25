@@ -15,6 +15,9 @@ const selectedShoeDetails = ref({
   description: '',
   picture: '', // Placeholder for the shoe image URL
   status: '', // Default status
+  customerName: '',
+  customerAddress: '',
+  customerNumber: '',
 });
 
 
@@ -31,6 +34,8 @@ const statusColor = (status: string) => {
   if (status === "To Shipped") return "bg-yellow-300 text-black";
   if (status === "In Transit") return "bg-orange-500 text-white";
   if (status === "Received") return "bg-green-500 text-white";
+  if (status === "Unpaid") return "bg-yellow-300 text-black";
+  if (status === "Paid") return "bg-green-500 text-white";
   return "bg-gray-300 text-black";
 };
 
@@ -71,6 +76,9 @@ const showModal = (shoe: any) => {
     description: "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
     picture: "https://via.placeholder.com/150", // Placeholder image URL
     status: shoe.status, // Shoe status (Logistics, Shipped, Delivered)
+    customerName: "Customer A",
+    customerAddress: 'Pila Laguna',
+    customerNumber: '09323498431',
   };
   modalOpen.value = true;
 };
@@ -128,11 +136,14 @@ const getStatusBarStyle = (currentStatus: string, targetStatus: string) => {
                 <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
                   <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
-                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                  <TableCell class="px-4 py-2"><span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
                       {{ item.status }}
                     </span></TableCell>
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
-                  <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2 text-center"> <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.payment)">
+                      {{ item.payment }}
+                    </span>
+                        </TableCell>
                   <TableCell class="px-4 py-2">
                     <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
                   </TableCell>
@@ -143,8 +154,8 @@ const getStatusBarStyle = (currentStatus: string, targetStatus: string) => {
         </main>
 
         <!-- Modal for Shoe Details -->
-        <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
+        <div v-if="modalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
               <Button @click="closeModal" size="sm" variant="outline">Close</Button>
@@ -185,6 +196,18 @@ const getStatusBarStyle = (currentStatus: string, targetStatus: string) => {
               <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
                 <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Name:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerName }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Address:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerAddress }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Number:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerNumber }}</p>
               </div>
               <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
