@@ -29,7 +29,7 @@ const items = [
   { title: "Returned", url: "/admin/Returned", icon: Package },
   { title: "Completed", url: "/admin/Completed", icon: CheckCircle },
   { title: "Payments", url: "/admin/Payments", icon: CreditCard },
-  { title: "Branch", url: "/admin/Branch", icon: User },
+  { title: "Users", url: "/admin/Users", icon: User },
   
 ];
 
@@ -58,7 +58,7 @@ const logout = () => {
             </div>
           </SidebarGroupLabel>
 
-          <SidebarGroupContent class="flex-1 overflow-auto">
+          <SidebarGroupContent class="mt-4">
             <SidebarMenu>
               <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
@@ -75,8 +75,8 @@ const logout = () => {
           </SidebarGroupContent>
 
 
-          <!-- Branch Section (Newly Added) -->
-           <SidebarGroup class="pb-4 border-t">
+           <!-- Branch Section (Same as Dashboard) -->
+           <SidebarGroup class="mt-4 border-t">
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem v-for="item in branchItems" :key="item.title">
@@ -92,7 +92,7 @@ const logout = () => {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> 
+          </SidebarGroup>
 
           <!-- Log Out Section -->
           <SidebarGroup class="mt-32 pb-4 border-t">
