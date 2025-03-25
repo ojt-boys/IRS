@@ -14,15 +14,44 @@ const selectedShoeDetails = ref({
   brand: '',
   description: '',
   picture: '', // Placeholder for the shoe image URL
+  customerName: '',
+  customerAddress: '',
+  customerNumber: '',
 });
 
 const addShoeModalOpen = ref(false); // State for the add shoe modal
+
+
+
+
 const shoeDetails = ref({
-  shoeId: '',
-  branchNo: '',
-  service: '', // Service type
-  payment: '', // Payment method
+  shoeId: "",
+  branchNo: "",
+  service: "",
+  payment: "",
+  shoeType: "Pair",
+  quotation: 0,
+  customerName: "",
+  customerNumber: "",
+  customerAddress: "",
 });
+
+
+
+// Initialization for Add Shoe Modal
+const initializeShoeDetails = () => {
+  shoeDetails.value = {
+    shoeId: "",
+    branchNo: "",
+    service: "",
+    payment: "",
+    shoeType: "Pair",
+    quotation: 0,
+    customerName: "",
+    customerNumber: "",
+    customerAddress: "",
+  };
+};
 
 const isEditShoeModalOpen = ref(false); // State for the edit shoe modal
 
@@ -35,14 +64,15 @@ interface Shoe {
   status: string;
   service: string;
   payment: string;
-  selected?: boolean; // Add the selected field
+  selected?: boolean; 
+
 }
 
 // Sample table data with `selected` property added to each shoe
 const tableData = ref<Shoe[]>([
-  { id: 1, branch: "101", status: "To Shipped", service: "Repair", payment: "Pending", selected: false },
-  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Paid", selected: false },
-  { id: 3, branch: "305", status: "Received", service: "Cleaning", payment: "Paid", selected: false },
+  { id: 1, branch: "101", status: "To Shipped",  service: "Repair", payment: "Pending", selected: false },
+  { id: 2, branch: "101", status: "In Transit", service: "Customization", payment: "Paid", selected: false },
+  { id: 3, branch: "101", status: "Received", service: "Cleaning", payment: "Paid", selected: false },
 ]);
 
 const statusColor = (status: string) => {
@@ -72,7 +102,6 @@ const filteredTableData = computed(() => {
   return filtered;
 });
 
-
 const sendModalOpen = ref(false); // State to control the modal visibility
 
 // Function to open the modal
@@ -92,7 +121,7 @@ const confirmSendShoe = () => {
   closeSendModal(); // Close the modal after confirming
 };
 
-
+// Handle select all checkbox logic
 const isAllSelected = computed(() => {
   return tableData.value.every(item => item.selected);
 });
@@ -103,12 +132,6 @@ const toggleSelectAll = () => {
     item.selected = !isSelected;
   });
 };
-
-// Function to handle individual row checkbox change
-const handleRowSelection = () => {
-  // This will automatically update the "select all" checkbox state
-};;
-
 
 // Function to sort the table
 const sortTable = (key: string) => {
@@ -127,6 +150,9 @@ const showModal = (shoe: any) => {
     brand: "Nike",       // Example static brand
     description: "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
     picture: "https://via.placeholder.com/150", // Placeholder image URL
+    customerName: "Customer A",
+    customerAddress: 'Pila Laguna',
+    customerNumber: '09323498431',
   };
   modalOpen.value = true;
 };
@@ -138,6 +164,7 @@ const closeModal = () => {
 
 // Open modal for adding a shoe
 const showAddShoeModal = () => {
+  initializeShoeDetails();  // Initialize shoe details before showing the modal
   addShoeModalOpen.value = true;
 };
 
@@ -145,18 +172,25 @@ const showAddShoeModal = () => {
 const closeAddShoeModal = () => {
   addShoeModalOpen.value = false;
   // Reset inputs
-  shoeDetails.value = { shoeId: '', branchNo: '', service: '', payment: '' };
+  initializeShoeDetails(); // Reset the shoe details to default values
 };
 
-// Open Edit Modal and populate the selected shoe for editing
 const showEditModal = (shoe: any) => {
-  // Static data for editing
-  selectedShoeDetails.value = {
-    name: shoe.name || "Air Max 97",
-    brand: shoe.brand || "Nike",
-    description: shoe.description || "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
-    picture: shoe.picture || "https://via.placeholder.com/150",
-  };
+  // Initialize shoe details before populating
+  initializeShoeDetails();
+
+  // Set the details of the selected shoe to edit
+  shoeDetails.value.shoeId = shoe.shoeId || "";
+  shoeDetails.value.branchNo = shoe.branchNo || "";
+  shoeDetails.value.service = shoe.service || "";
+  shoeDetails.value.payment = shoe.payment || "";
+  shoeDetails.value.shoeType = shoe.shoeType || "Pair";
+  shoeDetails.value.quotation = shoe.quotation || 0;
+  shoeDetails.value.customerName = shoe.customerName || "";
+  shoeDetails.value.customerNumber = shoe.customerNumber || "";
+  shoeDetails.value.customerAddress = shoe.customerAddress || "";
+
+  // Open the edit modal
   isEditShoeModalOpen.value = true;
 };
 
@@ -171,14 +205,26 @@ const saveShoeChanges = () => {
   isEditShoeModalOpen.value = false;
 };
 
+// Function to calculate the quotation based on the selected service
+const calculateQuotation = () => {
+  // You can modify this logic to reflect actual pricing logic
+  const servicePricing: Record<string, number> = {
+    "Full Reglue": 1000,
+    "Partial Reglue": 500,
+    "Re stitch": 800,
+  };
+
+  shoeDetails.value.quotation = servicePricing[shoeDetails.value.service] || 0;
+};
+
 // Function to handle the form submission (you can modify this as needed)
 const addShoe = () => {
   const newShoe = {
     id: 4, 
     branch: "404",
     status: "New",
-    service: "Cleaning",
-    payment: "Pending",
+    service: shoeDetails.value.service,
+    payment: shoeDetails.value.payment,
     selected: false, // Add selected property for the new shoe
   };
 
@@ -186,12 +232,10 @@ const addShoe = () => {
 };
 
 // Dropdown options
-const serviceOptions = ['REGULAR', 'DEEP CLEAN', 'PREMIUM', 'EXTRAS'];
+const serviceOptions = ['Full Reglue', 'Partial Reglue', 'Re stitch'];
 const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
 
 </script>
-
-
 
 <template>
   <SidebarProvider>
@@ -209,12 +253,8 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
         <main class="flex-1 p-6 w-full">
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
             <div class="flex justify-between mb-4">
-            
               <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
-  
-              <Button variant="outline" @click="showAddShoeModal">
-                Add New Shoe
-              </Button>
+              <Button variant="outline" @click="showAddShoeModal">Add New Shoe</Button>
             </div>
 
             <Table class="w-full border rounded-lg">
@@ -236,7 +276,7 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
                 <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
                   <!-- Checkbox for each row -->
                   <TableCell class="px-4 py-2">
-                    <input type="checkbox" v-model="item.selected" @change="handleRowSelection" />
+                    <input type="checkbox" v-model="item.selected" />
                   </TableCell>
                   <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
@@ -256,100 +296,158 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
             </Table>
 
             <div class="flex justify-end mt-4">
-              <Button variant="outline" @click="sendShoeModal">
-                Send
-              </Button>
+              <Button variant="outline" @click="sendShoeModal">Send</Button>
             </div>
           </div>
-
-
         </main>
 
+        <!-- Modal Sections -->
+        <div v-if="sendModalOpen" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+          <div class="bg-white dark:bg-gray-800 rounded-lg w-96 p-6">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Confirm Send Shoe</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Are you sure you want to send the selected shoe? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-2">
+              <Button variant="outline" @click="closeSendModal">Cancel</Button>
+              <Button variant="outline" @click="confirmSendShoe">Confirm</Button>
+            </div>
+          </div>
+        </div>
 
+<!-- Modal for Add Shoe -->
+<div v-if="addShoeModalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
+    <h2 class="text-lg font-semibold text-center">Add New Shoe</h2>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Shoe ID</label>
+      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Branch No</label>
+      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Service</label>
+      <select v-model="shoeDetails.service" @change="calculateQuotation" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option v-for="option in serviceOptions" :key="option" :value="option">{{ option }}</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Shoe Type</label>
+      <select v-model="shoeDetails.shoeType" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option value="Pair">Pair</option>
+        <option value="Single">Single</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Type of Payments</label>
+      <select v-model="shoeDetails.payment" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option v-for="option in paymentOptions" :key="option" :value="option">{{ option }}</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Name</label>
+      <Input v-model="shoeDetails.customerName" placeholder="Enter Customer Name" class="w-full" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Number</label>
+      <Input v-model="shoeDetails.customerNumber" placeholder="Enter Customer Number" class="w-full" type="tel" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Address</label>
+      <Input v-model="shoeDetails.customerAddress" placeholder="Enter Customer Address" class="w-full" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Estimated Quotation:</label>
+      <p class="text-lg font-semibold text-gray-800 dark:text-gray-200">₱{{ shoeDetails.quotation }}</p>
+    </div>
+    <div class="flex justify-end">
+      <Button @click="addShoe" class="mr-2">Add Shoe</Button>
+      <Button variant="outline" @click="closeAddShoeModal">Cancel</Button>
+    </div>
+  </div>
+</div>
 
+        <!-- Modal for Edit Shoe -->
+<!-- Modal for Edit Shoe -->
+<div v-if="isEditShoeModalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
+    <h2 class="text-lg font-semibold text-center">Edit Shoe</h2>
 
-        <!-- Send Shoe Modal -->
-<div v-if="sendModalOpen" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg w-96 p-6">
-    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Confirm Send Shoe</h3>
-    <p class="text-gray-600 dark:text-gray-300 mb-4">Are you sure you want to send the selected shoe? This action cannot be undone.</p>
-    <div class="flex justify-end space-x-2">
-      <Button variant="outline" @click="closeSendModal">Cancel</Button>
-      <Button variant="outline" @click="confirmSendShoe">Confirm</Button>
+    <!-- Shoe ID -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Shoe ID</label>
+      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" />
+    </div>
+
+    <!-- Branch No -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Branch No</label>
+      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" />
+    </div>
+
+    <!-- Service -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Service</label>
+      <select v-model="shoeDetails.service" @change="calculateQuotation" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option v-for="option in serviceOptions" :key="option" :value="option">{{ option }}</option>
+      </select>
+    </div>
+
+    <!-- Shoe Type -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Shoe Type</label>
+      <select v-model="shoeDetails.shoeType" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option value="Pair">Pair</option>
+        <option value="Single">Single</option>
+      </select>
+    </div>
+
+    <!-- Type of Payments -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Type of Payments</label>
+      <select v-model="shoeDetails.payment" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
+        <option v-for="option in paymentOptions" :key="option" :value="option">{{ option }}</option>
+      </select>
+    </div>
+
+    <!-- Customer Name -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Name</label>
+      <Input v-model="shoeDetails.customerName" placeholder="Enter Customer Name" class="w-full" />
+    </div>
+
+    <!-- Customer Number -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Number</label>
+      <Input v-model="shoeDetails.customerNumber" placeholder="Enter Customer Number" class="w-full" type="tel" />
+    </div>
+
+    <!-- Customer Address -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Customer Address</label>
+      <Input v-model="shoeDetails.customerAddress" placeholder="Enter Customer Address" class="w-full" />
+    </div>
+
+    <!-- Estimated Quotation -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Estimated Quotation:</label>
+      <p class="text-lg font-semibold text-gray-800 dark:text-gray-200">₱{{ shoeDetails.quotation }}</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end">
+      <Button @click="saveShoeChanges" class="mr-2">Save Changes</Button>
+      <Button variant="outline" @click="closeEditShoeModal">Cancel</Button>
     </div>
   </div>
 </div>
 
 
-        <!-- Modal for Add Shoe -->
-        <div v-if="addShoeModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Add New Shoe</h2>
-              <Button @click="closeAddShoeModal" size="sm" variant="outline">Close</Button>
-            </div>
-            <div>
-              <div class="mb-4">
-                <Input v-model="shoeDetails.shoeId" placeholder="Shoe ID" class="w-full" />
-              </div>
-              <div class="mb-4">
-                <Input v-model="shoeDetails.branchNo" placeholder="Branch No." class="w-full" />
-              </div>
-              <div class="mb-4">
-                <label for="service" class="block text-gray-600 dark:text-gray-300">Service</label>
-                <select v-model="shoeDetails.service" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
-                  <option v-for="option in serviceOptions" :key="option" :value="option">{{ option }}</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label for="payment" class="block text-gray-600 dark:text-gray-300">Method of Payment</label>
-                <select v-model="shoeDetails.payment" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
-                  <option v-for="option in paymentOptions" :key="option" :value="option">{{ option }}</option>
-                </select>
-              </div>
-              <Button @click="addShoe" variant="outline">
-                Add Shoe
-              </Button>
-            </div>
-          </div>
-        </div>
 
-        <!-- Modal for Edit Shoe -->
-        <div v-if="isEditShoeModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Edit Shoe</h2>
-              <Button @click="closeEditShoeModal" size="sm" variant="outline">Close</Button>
-            </div>
-            <div>
-              <div class="mb-4">
-                <Input v-model="shoeDetails.shoeId" placeholder="Shoe ID" class="w-full" disabled />
-              </div>
-              <div class="mb-4">
-                <Input v-model="shoeDetails.branchNo" placeholder="Branch No." class="w-full" />
-              </div>
-              <div class="mb-4">
-                <label for="service" class="block text-gray-600 dark:text-gray-300">Service</label>
-                <select v-model="shoeDetails.service" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
-                  <option v-for="option in serviceOptions" :key="option" :value="option">{{ option }}</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label for="payment" class="block text-gray-600 dark:text-gray-300">Method of Payment</label>
-                <select v-model="shoeDetails.payment" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md">
-                  <option v-for="option in paymentOptions" :key="option" :value="option">{{ option }}</option>
-                </select>
-              </div>
-              <Button @click="saveShoeChanges" variant="outline">
-                Save Changes
-              </Button>
-            </div>
-          </div>
-        </div>
 
-        <!-- Modal for Shoe Details -->
-        <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
+          <!-- Modal for Shoe Details -->
+          <div v-if="modalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
               <Button @click="closeModal" size="sm" variant="outline">Close</Button>
@@ -364,6 +462,18 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
                 <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
               </div>
               <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Name:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerName }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Address:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerAddress }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Number:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerNumber }}</p>
+              </div>
+              <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
                 <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.description }}</p>
               </div>
@@ -375,11 +485,11 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
               </div>
             </div>
           </div>
-        </div>
+
+
+
+          </div>
       </div>
     </div>
   </SidebarProvider>
 </template>
-
-
-

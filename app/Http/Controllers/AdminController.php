@@ -41,9 +41,9 @@ class AdminController extends Controller
         return Inertia::render('Admin/Payments');
     }
 
-    public function Branch()
+    public function Users()
     {
-        return Inertia::render('Admin/Branch');
+        return Inertia::render('Admin/Users');
     }
 
     public function Addshoes()
