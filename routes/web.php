@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BranchController;
+use App\Http\Middleware\RoleMiddleware;  // Import the middleware
 
 // Welcome page route
 Route::get('/', function () {
@@ -16,18 +17,23 @@ Route::get('/', function () {
     ]);
 });
 
-// Inside authenticated middleware group for both admin and branch routes
+// Inside authenticated middleware group
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/Dashboard', [AdminController::class, 'Dashboard'])->name('Dashboard'); // Admin Dashboard route
+    // Admin Routes with Role Middleware
+    Route::prefix('admin')
+        ->name('admin.')
+        ->middleware(RoleMiddleware::class.':admin,super-admin')  // Apply middleware with roles
+        ->group(function () {
 
-        // Admin specific routes
+        Route::get('/Dashboard', [AdminController::class, 'Dashboard'])
+            ->name('Dashboard');
+
+        // Admin-specific routes
         $adminRoutes = [
             'Incoming',
             'Assessment',
@@ -42,11 +48,16 @@ Route::middleware([
 
         foreach ($adminRoutes as $route) {
             Route::get("/$route", [AdminController::class, $route])->name($route);
+
         }
     });
 
-    // Branch routes
-    Route::prefix('branch')->name('branch.')->group(function () {
+    // Branch Routes with Role Middleware
+    Route::prefix('branch')
+        ->name('branch.')
+        ->middleware(RoleMiddleware::class.':branch,super-admin')  // Apply middleware with roles
+        ->group(function () {
+
         $branchRoutes = [
             'Addshoes',
             'Shippedshoes',
@@ -57,4 +68,4 @@ Route::middleware([
         }
     });
 
-}); 
+});
