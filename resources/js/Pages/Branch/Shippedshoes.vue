@@ -7,7 +7,6 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 
-
 // Modal state and shoe details
 const modalOpen = ref(false);
 const selectedShoeDetails = ref({
@@ -15,21 +14,28 @@ const selectedShoeDetails = ref({
   brand: '',
   description: '',
   picture: '', // Placeholder for the shoe image URL
+  status: '', // Default status
+  customerName: '',
+  customerAddress: '',
+  customerNumber: '',
 });
 
-const title = "Branch Dashboard";
+
+const title="Branch Shipped"
 
 // Sample table data
 const tableData = ref([
-  { id: 1, branch: "101", status: "To Shipped", service: "Repair", payment: "Gcash" },
-  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Cash" },
-  { id: 3, branch: "305", status: "Received", service: "Cleaning", payment: "Cash" },
+  { id: 1, branch: "101", status: "To Shipped", service: "Repair", payment: "Unpaid" },
+  { id: 2, branch: "203", status: "In Transit", service: "Customization", payment: "Paid" },
+  { id: 3, branch: "305", status: "Received", service: "Cleaning", payment: "Paid" },
 ]);
 
 const statusColor = (status: string) => {
-  if (status === "To Shipped") return "bg-yellow-500 text-white";
+  if (status === "To Shipped") return "bg-yellow-300 text-black";
   if (status === "In Transit") return "bg-orange-500 text-white";
   if (status === "Received") return "bg-green-500 text-white";
+  if (status === "Unpaid") return "bg-yellow-300 text-black";
+  if (status === "Paid") return "bg-green-500 text-white";
   return "bg-gray-300 text-black";
 };
 
@@ -62,27 +68,38 @@ const sortTable = (key: string) => {
   }
 };
 
-// Open modal function with static sample shoe data
+// Open modal function with static sample shoe data for Details
 const showModal = (shoe: any) => {
   selectedShoeDetails.value = {
     name: "Air Max 97",  // Example static shoe name
     brand: "Nike",       // Example static brand
     description: "A legendary design that made waves when it first debuted. Air Max 97 features full-length Air cushioning for all-day comfort.",
     picture: "https://via.placeholder.com/150", // Placeholder image URL
+    status: shoe.status, // Shoe status (Logistics, Shipped, Delivered)
+    customerName: "Customer A",
+    customerAddress: 'Pila Laguna',
+    customerNumber: '09323498431',
   };
   modalOpen.value = true;
 };
 
-// Close modal
+// Close Details modal
 const closeModal = () => {
   modalOpen.value = false;
 };
 
-
-
-
-
-
+// Function to get the progress bar style based on the current status
+const getStatusBarStyle = (currentStatus: string, targetStatus: string) => {
+  if (currentStatus === targetStatus) {
+    return 'width: 100%';
+  } else if (
+    (currentStatus === 'To Shipped' && targetStatus === 'In Transit') ||
+    (currentStatus === 'In Transit' && targetStatus === 'Received')
+  ) {
+    return 'width: 50%';
+  }
+  return 'width: 0%';
+};
 </script>
 
 <template>
@@ -97,12 +114,13 @@ const closeModal = () => {
             {{ title }}
           </div>
         </header>
+
         <main class="flex-1 p-6 w-full">
-
-
-          <!-- Search & Table Section -->
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
-            <Input v-model="searchQuery" placeholder="Search..." class="mb-4 w-full" />
+            <div class="flex justify-between mb-4">
+              <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
+            </div>
+
             <Table class="w-full border rounded-lg">
               <TableHeader>
                 <TableRow class="bg-gray-200 dark:bg-gray-700">
@@ -118,11 +136,14 @@ const closeModal = () => {
                 <TableRow v-for="item in filteredTableData" :key="item.id" class="border-b last:border-b-0">
                   <TableCell class="px-4 py-2">{{ item.id }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.branch }}</TableCell>
-                  <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                  <TableCell class="px-4 py-2"><span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
                       {{ item.status }}
                     </span></TableCell>
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
-                  <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2 text-center"> <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.payment)">
+                      {{ item.payment }}
+                    </span>
+                        </TableCell>
                   <TableCell class="px-4 py-2">
                     <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
                   </TableCell>
@@ -130,16 +151,43 @@ const closeModal = () => {
               </TableBody>
             </Table>
           </div>
-
         </main>
 
         <!-- Modal for Shoe Details -->
-        <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div class="bg-white dark:bg-gray-800 rounded-lg w-1/3 p-6">
+        <div v-if="modalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
               <Button @click="closeModal" size="sm" variant="outline">Close</Button>
             </div>
+
+
+   <!-- Status Tracker (Logistics -> Shipped -> Delivered) -->
+
+            <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Status:</strong>
+                <div class="relative pt-4">
+                  <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                    <span>To Shipped</span>
+                    <span>In Transit</span>
+                    <span>Received</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'To Shipped')"></div>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'In Transit')"></div>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                      <div class="h-1 bg-blue-500 rounded-full" :style="getStatusBarStyle(selectedShoeDetails.status, 'Received')"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
             <div>
               <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Shoe Name:</strong>
@@ -148,6 +196,18 @@ const closeModal = () => {
               <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
                 <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.brand }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Name:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerName }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Address:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerAddress }}</p>
+              </div>
+              <div class="mb-4">
+                <strong class="text-gray-600 dark:text-gray-300">Customer Number:</strong>
+                <p class="text-gray-800 dark:text-gray-200">{{ selectedShoeDetails.customerNumber }}</p>
               </div>
               <div class="mb-4">
                 <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
@@ -159,10 +219,12 @@ const closeModal = () => {
                   <img :src="selectedShoeDetails.picture" alt="Shoe Image" class="max-h-full max-w-full" />
                 </div>
               </div>
+
+              <!-- Status Tracker (Logistics -> Shipped -> Delivered) -->
+              
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </SidebarProvider>

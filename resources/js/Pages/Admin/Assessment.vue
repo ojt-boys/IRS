@@ -98,6 +98,94 @@ const handleAccept = () => {
   console.log('Accepted');
   isPopupVisible.value = false; // Close the popup
 };
+
+
+
+
+const AsearchQuery = ref("");
+const AselectedBatch = ref<number | null>(null);
+
+// Modal States
+const AmodalOpen = ref(false);
+const AselectedShoeDetails = ref({
+  shoe: 'Nike Air Max',
+  description: 'This is a popular model known for its comfort and style.',
+  brand: 'Nike',
+  image: 'https://via.placeholder.com/150',
+});
+
+// Popup States for Accept/Decline
+const AisPopupVisible = ref(false);
+const AisDeclinePopup = ref(false);
+const AdeclineReason = ref("");
+
+// Filtered table data based on search query
+const AfilteredTableData = computed(() => {
+  if (!searchQuery.value) return tableData.value;
+  return tableData.value.filter(item =>
+    Object.values(item).some(value =>
+      value.toString().toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  );
+});
+
+// Get unique batch numbers after filtering
+const AuniqueBatches = computed(() => {
+  return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
+});
+
+// Function to select a batch and display its data
+const AselectBatch = (batch: number) => {
+  AselectedBatch.value = batch;
+};
+
+// Function to go back to the list of batches
+const AgoBack = () => {
+  AselectedBatch.value = null;
+};
+
+// Function to open the modal with shoe details
+const AshowShoeDetails = (shoe: any) => {
+  selectedShoeDetails.value = {
+    shoe: shoe.shoe,
+    description: `Description for ${shoe.shoe}`,
+    brand: "Brand: Nike",
+    image: 'https://via.placeholder.com/150',
+  };
+  modalOpen.value = true; // Open the modal when a shoe is selected
+};
+
+// Function to close the shoe details modal
+const AcloseModal = () => {
+  modalOpen.value = false; // Close the modal
+};
+
+// Modal handling for "Accept" and "Decline"
+const AconfirmAction = (action: string, item: any) => {
+  // Show the confirmation popup
+  isPopupVisible.value = true;
+  if (action === 'Decline') {
+    isDeclinePopup.value = true; // Show the decline reason input
+  } else {
+    isDeclinePopup.value = false; // Show the accept confirmation
+  }
+  console.log(`Action: ${action} on item`, item);
+};
+
+const AhandleDecline = () => {
+  // Handle decline logic here (e.g., store the reason and update status)
+  console.log(`Declined for reason: ${declineReason.value}`);
+  isPopupVisible.value = false; // Close the popup
+};
+
+const AhandleAccept = () => {
+  // Handle accept logic here
+  console.log('Accepted');
+  isPopupVisible.value = false; // Close the popup
+};
+
+
+
 </script>
 
 <template>
@@ -185,9 +273,166 @@ const handleAccept = () => {
               </TableBody>
             </Table>
           </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Shoe Tech ASSESSMENT -->
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
+            <div class="flex justify-between mb-4">
+              <Input v-model="AsearchQuery" placeholder="Search..." class="w-1/2" />
+            </div>
+
+            <!-- Display a back button if a batch is selected -->
+            <div v-if="AselectedBatch !== null" class="mb-4">
+              <Button @click="AgoBack" class="mb-4">
+                Back
+              </Button>
+            </div>
+
+            <Table class="w-full border rounded-lg">
+              <TableHeader>
+                <TableRow class="bg-gray-200 dark:bg-gray-700">
+                  <TableHead class="px-4 py-2 text-left">Batch</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Shoe</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Service</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Branch No.</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                <!-- Show batches or the selected batch data -->
+                <template v-if="AselectedBatch === null">
+                  <template v-for="(batchGroup, index) in AuniqueBatches" :key="index">
+                    <TableRow @click="AselectBatch(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
+                      <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
+                        Batch {{ batchGroup }}
+                      </TableCell>
+                    </TableRow>
+                  </template>
+                </template>
+
+                <!-- Display selected batch data -->
+                <template v-else>
+                  <template v-for="item in AfilteredTableData" :key="item.id">
+                    <template v-if="item.batch === AselectedBatch">
+                      <TableRow class="border-b last:border-b-0">
+                        <TableCell class="px-4 py-2 text-center">{{ item.batch }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">
+                          <!-- Detail Button -->
+                          <Button size="sm" variant="outline" @click="AshowShoeDetails(item)">
+                            Detail
+                          </Button>
+
+                          <!-- Accept Button -->
+                          <Button size="sm" variant="outline" class="ml-2 text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
+                                  @click="AconfirmAction('Accept', item)">
+                            Accept
+                          </Button>
+
+                          <!-- Decline Button -->
+                          <Button size="sm" variant="outline" class="ml-2 text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                                  @click="AconfirmAction('Decline', item)">
+                            Decline
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </template>
+                  </template>
+                </template>
+              </TableBody>
+            </Table>
+          </div>
         </main>
       </div>
     </div>
+
+
+
+
+
+
+        <!-- Modal for shoe details -->
+        <div v-if="AmodalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Shoe Details</h2>
+          <Button @click="AcloseModal" size="sm" variant="outline">Close</Button>
+        </div>
+        <div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Shoe:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ AselectedShoeDetails.shoe }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Brand:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ AselectedShoeDetails.brand }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Description:</strong>
+            <p class="text-gray-800 dark:text-gray-200">{{ AselectedShoeDetails.description }}</p>
+          </div>
+          <div class="mb-4">
+            <strong class="text-gray-600 dark:text-gray-300">Picture:</strong>
+            <div class="flex justify-center items-center h-48 bg-gray-200 dark:bg-gray-700">
+              <img :src="AselectedShoeDetails.image" alt="Shoe Image" class="max-h-full max-w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for confirmation (Accept/Decline) -->
+    <div v-if="AisPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+            Are you sure you want to {{ AisDeclinePopup ? 'Decline' : 'Accept' }}?
+          </h2>
+          <Button @click="isPopupVisible = false" size="sm" variant="outline">Close</Button>
+        </div>
+        
+        <!-- Decline reason input -->
+        <div v-if="isDeclinePopup">
+          <Input v-model="AdeclineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
+        </div>
+
+        <div class="flex justify-between">
+          <Button @click="isPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
+            Cancel
+          </Button>
+          <Button @click="isDeclinePopup ? AhandleDecline() : AhandleAccept()" class="bg-green-500 text-white hover:bg-green-600">
+            Confirm
+          </Button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+        
+
+
+
+    
 
     <!-- Modal for shoe details -->
     <div v-if="modalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

@@ -6,43 +6,53 @@ use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function adminDashboard()
+    public function Dashboard()
     {
-        return Inertia::render('Admin/adminDashboard'); // Renders the 'Admin/adminDashboard' Vue component
+        return Inertia::render('Admin/Dashboard');
     }
 
-    public function adminIncoming()
+    public function Incoming()
     {
-        return Inertia::render('Admin/adminIncoming'); // Renders the 'Admin/adminIncoming' Vue component
+        return Inertia::render('Admin/Incoming');
     }
 
-    public function adminAssessment()
+    public function Assessment()
     {
-        return Inertia::render('Admin/adminAssessment'); // Renders the 'Admin/adminAssessment' Vue component
+        return Inertia::render('Admin/Assessment');
     }
 
-    public function adminJoborder()
+    public function Joborder()
     {
-        return Inertia::render('Admin/adminJoborder'); // Renders the 'Admin/adminJoborder' Vue component
+        return Inertia::render('Admin/Joborder');
     }
 
-    public function adminReturned()
+    public function Returned()
     {
-        return Inertia::render('Admin/adminReturned'); // Renders the 'Admin/adminReturned' Vue component
+        return Inertia::render('Admin/Returned');
     }
 
-    public function adminCompleted()
+    public function Completed()
     {
-        return Inertia::render('Admin/adminCompleted'); // Renders the 'Admin/adminCompleted' Vue component
+        return Inertia::render('Admin/Completed');
     }
 
-    public function adminPayments()
+    public function Payments()
     {
-        return Inertia::render('Admin/adminPayments'); // Renders the 'Admin/adminPayments' Vue component
+        return Inertia::render('Admin/Payments');
     }
 
-    public function adminBranch()
+    public function Users()
     {
-        return Inertia::render('Admin/adminBranch'); // Renders the 'Admin/adminBranch' Vue component
+        return Inertia::render('Admin/Users');
+    }
+
+    public function Addshoes()
+    {
+        return Inertia::render('Admin/Addshoes');
+    }
+
+    public function Shippedshoes()
+    {
+        return Inertia::render('Admin/Shippedshoes');
     }
 }

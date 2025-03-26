@@ -13,11 +13,11 @@ const title = "Incoming";
 const status = ref("Pending");
 
 const tableData = ref([
-  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", dateTime: "2025-03-07 14:30" },
-  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", dateTime: "2025-03-07 16:00" },
-  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", dateTime: "2025-03-07 18:45" },
-  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", dateTime: "2025-03-08 10:15" },
-  { batch: 2, id: 5, branch: "204", service: "Waterproofing", shoe: "New Balance 574", dateTime: "2025-03-08 12:45" },
+  { batch: 1, id: 1, branch: "101", service: "Cleaning", shoe: "Nike Air Max", status: "Paid", dateTime: "2025-03-07 14:30" },
+  { batch: 1, id: 2, branch: "203", service: "Repair", shoe: "Adidas UltraBoost", status: "Paid", dateTime: "2025-03-07 16:00" },
+  { batch: 1, id: 3, branch: "305", service: "Polishing", shoe: "Puma RS-X", status: "Paid", dateTime: "2025-03-07 18:45" },
+  { batch: 2, id: 4, branch: "102", service: "Sole Replacement", shoe: "Reebok Classic", status: "Paid", dateTime: "2025-03-08 10:15" },
+  { batch: 2, id: 5, branch: "204", service: "Waterproofing", shoe: "New Balance 574", status: "Paid", dateTime: "2025-03-08 12:45" },
 ]);
 
 const searchQuery = ref("");
@@ -41,6 +41,13 @@ const filteredTableData = computed(() => {
     )
   );
 });
+
+const statusColor = (status: string) => {
+  if (status === "Unpaid") return "bg-yellow-300 text-black";
+  if (status === "Paid") return "bg-green-500 text-white";
+  return "bg-gray-300 text-black";
+};
+
 
 // Get unique batch numbers after filtering
 const uniqueBatches = computed(() => {
@@ -131,6 +138,7 @@ const markBatchAsReceived = () => {
                   <TableHead class="px-4 py-2 text-left">Batch</TableHead>
                   <TableHead class="px-4 py-2 text-center">Shoe</TableHead>
                   <TableHead class="px-4 py-2 text-center">Service</TableHead>
+                  <TableHead class="px-4 py-2 text-center">Status</TableHead>
                   <TableHead class="px-4 py-2 text-center">Branch No.</TableHead>
                   <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
                   <TableHead class="px-4 py-2 text-center">Action</TableHead>
@@ -157,6 +165,10 @@ const markBatchAsReceived = () => {
                         <TableCell class="px-4 py-2 text-center">{{ item.batch }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
+                        <TableCell class="px-4 py-2 text-center">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
+                      {{ item.status }}
+                    </span>
+                        </TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.branch }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
                         <TableCell class="px-4 py-2 text-center">

@@ -35,20 +35,20 @@ Route::middleware([
 
         // Admin-specific routes
         $adminRoutes = [
-            'adminIncoming',
-            'adminAssessment',
-            'adminJoborder',
-            'adminReturned',
-            'adminCompleted',
-            'adminPayments',
-            'adminBranch',
-            'branchAddshoes',
-            'branchShippedshoes',
+            'Incoming',
+            'Assessment',
+            'Joborder',
+            'Returned',
+            'Completed',
+            'Payments',
+            'Users',
+            'Addshoes',
+            'Shippedshoes',
         ];
 
         foreach ($adminRoutes as $route) {
-            Route::get("/$route", [AdminController::class, $route])
-                ->name($route);
+            Route::get("/$route", [AdminController::class, $route])->name($route);
+
         }
     });
 
@@ -59,16 +59,12 @@ Route::middleware([
         ->group(function () {
 
         $branchRoutes = [
-            'branchDashboard',
-            'branchAddshoes',
-            'branchShippedshoes',
-            'branchReturned',
-            'branchCompleted',
+            'Addshoes',
+            'Shippedshoes',
         ];
 
         foreach ($branchRoutes as $route) {
-            Route::get("/$route", [BranchController::class, $route])
-                ->name($route);
+            Route::get("/$route", [BranchController::class, $route])->name($route);
         }
     });
 

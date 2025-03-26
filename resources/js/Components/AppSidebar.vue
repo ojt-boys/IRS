@@ -22,14 +22,14 @@ import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 
 const items = [
-  { title: "Dashboard", url: "/admin/adminDashboard", icon: Home },
-  { title: "Incoming", url: "/admin/adminIncoming", icon: Inbox },
-  { title: "Assessment", url: "/admin/adminAssessment", icon: ClipboardCheck },
-  { title: "Job Order", url: "/admin/adminJoborder", icon: Search },
-  { title: "Returned", url: "/admin/adminReturned", icon: Package },
-  { title: "Completed", url: "/admin/adminCompleted", icon: CheckCircle },
-  { title: "Payments", url: "/admin/adminPayments", icon: CreditCard },
-  { title: "Branch", url: "/admin/adminBranch", icon: User },
+  { title: "Dashboard", url: "/admin/Dashboard", icon: Home },
+  { title: "Incoming", url: "/admin/Incoming", icon: Inbox },
+  { title: "Assessment", url: "/admin/Assessment", icon: ClipboardCheck },
+  { title: "Job Order", url: "/admin/Joborder", icon: Search },
+  { title: "Returned", url: "/admin/Returned", icon: Package },
+  { title: "Completed", url: "/admin/Completed", icon: CheckCircle },
+  { title: "Payments", url: "/admin/Payments", icon: CreditCard },
+  { title: "Users", url: "/admin/Users", icon: User },
   
 ];
 
@@ -37,8 +37,8 @@ const items = [
 
 const branchItems = [
 
-  { title: "Add Shoes", url: "/branch/branchAddshoes", icon: Inbox },
-  { title: "Shipped Shoes", url: "/branch/branchShippedshoes", icon: ClipboardCheck },
+  { title: "Add Shoes", url: "/branch/Addshoes", icon: Inbox },
+  { title: "Shipped Shoes", url: "/branch/Shippedshoes", icon: ClipboardCheck },
 ];
 
 const logout = () => {
@@ -58,7 +58,7 @@ const logout = () => {
             </div>
           </SidebarGroupLabel>
 
-          <SidebarGroupContent class="flex-1 overflow-auto">
+          <SidebarGroupContent class="mt-4">
             <SidebarMenu>
               <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
@@ -75,8 +75,8 @@ const logout = () => {
           </SidebarGroupContent>
 
 
-          <!-- Branch Section (Newly Added) -->
-           <SidebarGroup class="pb-4 border-t">
+           <!-- Branch Section (Same as Dashboard) -->
+           <SidebarGroup class="mt-4 border-t">
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem v-for="item in branchItems" :key="item.title">
@@ -92,7 +92,7 @@ const logout = () => {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> 
+          </SidebarGroup>
 
           <!-- Log Out Section -->
           <SidebarGroup class="mt-32 pb-4 border-t">
