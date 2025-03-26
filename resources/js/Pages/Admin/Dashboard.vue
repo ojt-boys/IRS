@@ -226,6 +226,7 @@ const showShoeDetails = (shoe: any) => {
                   <TableHead @click="sortTable('status')" class="cursor-pointer px-4 py-2">Status</TableHead>
                   <TableHead @click="sortTable('service')" class="cursor-pointer px-4 py-2">Service</TableHead>
                   <TableHead @click="sortTable('payment')" class="cursor-pointer px-4 py-2">Payment</TableHead>
+                  <TableHead class="px-4 py-2">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -237,6 +238,9 @@ const showShoeDetails = (shoe: any) => {
                     </span></TableCell>
                   <TableCell class="px-4 py-2">{{ item.service }}</TableCell>
                   <TableCell class="px-4 py-2">{{ item.payment }}</TableCell>
+                  <TableCell class="px-4 py-2">
+                    <Button @click="showModal(item)" size="sm" variant="outline">Details</Button>
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
