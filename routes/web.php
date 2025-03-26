@@ -30,8 +30,8 @@ Route::middleware([
         ->middleware(RoleMiddleware::class.':admin,super-admin')  // Apply middleware with roles
         ->group(function () {
 
-        Route::get('/adminDashboard', [AdminController::class, 'adminDashboard'])
-            ->name('adminDashboard');
+        Route::get('/Dashboard', [AdminController::class, 'Dashboard'])
+            ->name('Dashboard');
 
         // Admin-specific routes
         $adminRoutes = [
