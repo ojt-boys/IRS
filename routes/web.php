@@ -35,7 +35,7 @@ Route::middleware([
             'Returned',
             'Completed',
             'Payments',
-            'Users',
+            'Branch',
             'Addshoes',
             'Shippedshoes',
         ];
