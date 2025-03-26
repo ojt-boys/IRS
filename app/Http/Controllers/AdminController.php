@@ -6,53 +6,43 @@ use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function Dashboard()
+    public function adminDashboard()
     {
-        return Inertia::render('Admin/Dashboard');
+        return Inertia::render('Admin/adminDashboard'); // Renders the 'Admin/adminDashboard' Vue component
     }
 
-    public function Incoming()
+    public function adminIncoming()
     {
-        return Inertia::render('Admin/Incoming');
+        return Inertia::render('Admin/adminIncoming'); // Renders the 'Admin/adminIncoming' Vue component
     }
 
-    public function Assessment()
+    public function adminAssessment()
     {
-        return Inertia::render('Admin/Assessment');
+        return Inertia::render('Admin/adminAssessment'); // Renders the 'Admin/adminAssessment' Vue component
     }
 
-    public function Joborder()
+    public function adminJoborder()
     {
-        return Inertia::render('Admin/Joborder');
+        return Inertia::render('Admin/adminJoborder'); // Renders the 'Admin/adminJoborder' Vue component
     }
 
-    public function Returned()
+    public function adminReturned()
     {
-        return Inertia::render('Admin/Returned');
+        return Inertia::render('Admin/adminReturned'); // Renders the 'Admin/adminReturned' Vue component
     }
 
-    public function Completed()
+    public function adminCompleted()
     {
-        return Inertia::render('Admin/Completed');
+        return Inertia::render('Admin/adminCompleted'); // Renders the 'Admin/adminCompleted' Vue component
     }
 
-    public function Payments()
+    public function adminPayments()
     {
-        return Inertia::render('Admin/Payments');
+        return Inertia::render('Admin/adminPayments'); // Renders the 'Admin/adminPayments' Vue component
     }
 
-    public function Branch()
+    public function adminBranch()
     {
-        return Inertia::render('Admin/Branch');
-    }
-
-    public function Addshoes()
-    {
-        return Inertia::render('Admin/Addshoes');
-    }
-
-    public function Shippedshoes()
-    {
-        return Inertia::render('Admin/Shippedshoes');
+        return Inertia::render('Admin/adminBranch'); // Renders the 'Admin/adminBranch' Vue component
     }
 }

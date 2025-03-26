@@ -86,6 +86,10 @@ const showModal = (shoe: any) => {
   modalOpen.value = true;
 };
 
+// Close modal
+const closeModal = () => {
+  modalOpen.value = false;
+};
 
 // Chart data
 const profitsData = ref({
@@ -112,68 +116,7 @@ const statusColor = (status: string) => {
   if (status === "Back Job") return "bg-orange-500 text-white";
   if (status === "In Transit") return "bg-green-500 text-white";
   if (status === "Failed") return "bg-red-500 text-white";
-  if (status === "Assigned") return "bg-orange-500 text-white";
   return "bg-gray-300 text-black";
-};
-
-
-
-
-
-
-const tableData = ref([
-  { batch: 1, id: 1, status: "Assigned", service: "Cleaning", shoe: "Nike Air Max", dateTime: "2025-03-07 14:30" },
-  { batch: 1, id: 2, status: "Assigned", service: "Repair", shoe: "Adidas UltraBoost", dateTime: "2025-03-07 16:00" },
-  { batch: 1, id: 3, status: "Assigned", service: "Polishing", shoe: "Puma RS-X", dateTime: "2025-03-07 18:45" },
-  { batch: 2, id: 4, status: "Assigned", service: "Sole Replacement", shoe: "Reebok Classic", dateTime: "2025-03-08 10:15" },
-  { batch: 2, id: 5, status: "Assigned", service: "Waterproofing", shoe: "New Balance 574", dateTime: "2025-03-08 12:45" },
-]);
-
-
-const selectedBatch = ref<number | null>(null);
-
-
-// Filtered table data based on search query
-const filteredTableData = computed(() => {
-  if (!searchQuery.value) return tableData.value;
-  return tableData.value.filter(item =>
-    Object.values(item).some(value =>
-      value.toString().toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-  );
-});
-
-// Get unique batch numbers after filtering
-const uniqueBatches = computed(() => {
-  return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
-});
-
-// Function to select a batch and display its data
-const selectBatch = (batch: number) => {
-  selectedBatch.value = batch;
-};
-
-// Function to go back to the list of batches
-const goBack = () => {
-  selectedBatch.value = null;
-};
-
-
-
-// Function to close the shoe details modal
-const closeModal = () => {
-  modalOpen.value = false; // Close the modal
-};
-
-
-const showShoeDetails = (shoe: any) => {
-  selectedShoeDetails.value = {
-    name: shoe.shoe,
-    description: `Description for ${shoe.shoe}`,
-    brand: "Brand: Nike",
-    picture: 'https://via.placeholder.com/150',
-  };
-  modalOpen.value = true; // Open the modal when a shoe is selected
 };
 
 
@@ -277,78 +220,7 @@ const showShoeDetails = (shoe: any) => {
             </Table>
           </div>
 
-          
-
-
-
-
-
- <!-- ShoeTech table Section -->
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
-            <div class="flex justify-between mb-4">
-              <Input v-model="searchQuery" placeholder="Search..." class="w-1/2" />
-            </div>
-
-            <!-- Display a back button if a batch is selected -->
-            <div v-if="selectedBatch !== null" class="mb-4">
-              <Button @click="goBack" class="mb-4">
-                Back
-              </Button>
-            </div>
-
-            <Table class="w-full border rounded-lg">
-              <TableHeader>
-                <TableRow class="bg-gray-200 dark:bg-gray-700">
-                  <TableHead class="px-4 py-2 text-left">Batch</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Shoe</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Service</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Status</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Date & Time</TableHead>
-                  <TableHead class="px-4 py-2 text-center">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                <!-- Show batches or the selected batch data -->
-                <template v-if="selectedBatch === null">
-                  <template v-for="(batchGroup, index) in uniqueBatches" :key="index">
-                    <TableRow @click="selectBatch(batchGroup)" class="cursor-pointer bg-gray-100 dark:bg-gray-800">
-                      <TableCell class="px-4 py-2 font-bold text-left w-full" colspan="7">
-                        Batch {{ batchGroup }}
-                      </TableCell>
-                    </TableRow>
-                  </template>
-                </template>
-
-                <!-- Display selected batch data -->
-                <template v-else>
-                  <template v-for="item in filteredTableData" :key="item.id">
-                    <template v-if="item.batch === selectedBatch">
-                      <TableRow class="border-b last:border-b-0">
-                        <TableCell class="px-4 py-2 text-center">{{ item.batch }}</TableCell>
-                        <TableCell class="px-4 py-2 text-center">{{ item.shoe }}</TableCell>
-                        <TableCell class="px-4 py-2 text-center">{{ item.service }}</TableCell>
-                        <TableCell class="px-4 py-2">                    <span class="px-2 py-1 rounded-lg font-semibold" :class="statusColor(item.status)">
-                      {{ item.status }}
-                    </span></TableCell>
-                        <TableCell class="px-4 py-2 text-center">{{ item.dateTime }}</TableCell>
-                        <TableCell class="px-4 py-2 text-center">
-                          <!-- Detail Button -->
-                          <Button size="sm" variant="outline" @click="showShoeDetails(item)">
-                            Detail
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </template>
-                  </template>
-                </template>
-              </TableBody>
-            </Table>
-          </div>
-
-          
         </main>
-        
 
         <!-- Modal for Shoe Details -->
         <div v-if="modalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

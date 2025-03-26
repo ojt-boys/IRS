@@ -25,35 +25,38 @@ Route::middleware([
 
     // Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/Dashboard', [AdminController::class, 'Dashboard'])->name('Dashboard'); // Admin Dashboard route
+        Route::get('/adminDashboard', [AdminController::class, 'adminDashboard'])->name('adminDashboard'); // Admin Dashboard route
 
         // Admin specific routes
         $adminRoutes = [
-            'Incoming',
-            'Assessment',
-            'Joborder',
-            'Returned',
-            'Completed',
-            'Payments',
-            'Branch',
-            'Addshoes',
-            'Shippedshoes',
+            'adminIncoming',
+            'adminAssessment',
+            'adminJoborder',
+            'adminReturned',
+            'adminCompleted',
+            'adminPayments',
+            'adminBranch',
+            'branchAddshoes',
+            'branchShippedshoes',
         ];
 
         foreach ($adminRoutes as $route) {
-            Route::get("/$route", [AdminController::class, $route])->name($route);
+            Route::get("/$route", [AdminController::class, $route])->name("admin.$route");
         }
     });
 
     // Branch routes
     Route::prefix('branch')->name('branch.')->group(function () {
         $branchRoutes = [
-            'Addshoes',
-            'Shippedshoes',
+            'branchDashboard',
+            'branchAddshoes',
+            'branchShippedshoes',
+            'branchReturned',
+            'branchCompleted',
         ];
 
         foreach ($branchRoutes as $route) {
-            Route::get("/$route", [BranchController::class, $route])->name($route);
+            Route::get("/$route", [BranchController::class, $route])->name("branch.$route");
         }
     });
 
