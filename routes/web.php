@@ -27,7 +27,6 @@ Route::middleware([
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/Dashboard', [AdminController::class, 'Dashboard'])->name('Dashboard'); // Admin Dashboard route
 
-        // Admin specific routes
         $adminRoutes = [
             'Incoming',
             'Assessment',
@@ -57,4 +56,4 @@ Route::middleware([
         }
     });
 
-}); 
+});

@@ -103,10 +103,6 @@ const earningsData = ref({
   data: [2400, 2210, 2290, 2000, 2181, 2500],
 });
 
-
-
-
-
 const statusColor = (status: string) => {
   if (status === "To Shipped") return "bg-yellow-300 text-black";
   if (status === "Back Job") return "bg-orange-500 text-white";
@@ -116,11 +112,6 @@ const statusColor = (status: string) => {
   return "bg-gray-300 text-black";
 };
 
-
-
-
-
-
 const tableData = ref([
   { batch: 1, id: 1, status: "Assigned", service: "Cleaning", shoe: "Nike Air Max", dateTime: "2025-03-07 14:30" },
   { batch: 1, id: 2, status: "Assigned", service: "Repair", shoe: "Adidas UltraBoost", dateTime: "2025-03-07 16:00" },
@@ -129,9 +120,7 @@ const tableData = ref([
   { batch: 2, id: 5, status: "Assigned", service: "Waterproofing", shoe: "New Balance 574", dateTime: "2025-03-08 12:45" },
 ]);
 
-
 const selectedBatch = ref<number | null>(null);
-
 
 // Filtered table data based on search query
 const filteredTableData = computed(() => {
@@ -159,7 +148,6 @@ const goBack = () => {
 };
 
 
-
 // Function to close the shoe details modal
 const closeModal = () => {
   modalOpen.value = false; // Close the modal
@@ -175,8 +163,6 @@ const showShoeDetails = (shoe: any) => {
   };
   modalOpen.value = true; // Open the modal when a shoe is selected
 };
-
-
 </script>
 
 <template>
