@@ -61,7 +61,7 @@ const logout = () => {
           <!-- LOGO SECTION -->
           <SidebarGroupLabel class="flex items-center justify-center h-20 border-b bg-white dark:bg-gray-800">
             <div class="w-full flex justify-center">
-              <AuthenticationCardLogo class="max-w-[70%] h-auto mx-auto" />
+              <AuthenticationCardLogo size="small" />
             </div>
           </SidebarGroupLabel>
 
