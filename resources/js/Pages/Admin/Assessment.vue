@@ -34,6 +34,15 @@ const isPopupVisible = ref(false);
 const isDeclinePopup = ref(false);
 const declineReason = ref("");
 
+// Static Shoe Tech Data
+const shoeTechList = ref([
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Smith' },
+  { id: 3, name: 'Alex Johnson' },
+]);
+
+const selectedShoeTech = ref(null);
+
 // Filtered table data based on search query
 const filteredTableData = computed(() => {
   if (!searchQuery.value) return tableData.value;
@@ -94,18 +103,26 @@ const handleDecline = () => {
 };
 
 const handleAccept = () => {
-  // Handle accept logic here
-  console.log('Accepted');
+  // Handle accept logic here and assign the selected shoe tech
+  if (selectedShoeTech.value) {
+    console.log(`Shoe Tech Assigned: ${selectedShoeTech.value.name}`);
+    // You can store or process the shoe tech assignment here
+  } else {
+    console.log('No Shoe Tech selected');
+  }
   isPopupVisible.value = false; // Close the popup
 };
 
 
 
 
+
+
+//// SHOE TECH ////
 const AsearchQuery = ref("");
 const AselectedBatch = ref<number | null>(null);
 
-// Modal States
+// Modal States for shoe details
 const AmodalOpen = ref(false);
 const AselectedShoeDetails = ref({
   shoe: 'Nike Air Max',
@@ -121,17 +138,17 @@ const AdeclineReason = ref("");
 
 // Filtered table data based on search query
 const AfilteredTableData = computed(() => {
-  if (!searchQuery.value) return tableData.value;
+  if (!AsearchQuery.value) return tableData.value;  // Ensure you're using the correct table data reference
   return tableData.value.filter(item =>
     Object.values(item).some(value =>
-      value.toString().toLowerCase().includes(searchQuery.value.toLowerCase())
+      value.toString().toLowerCase().includes(AsearchQuery.value.toLowerCase())
     )
   );
 });
 
 // Get unique batch numbers after filtering
 const AuniqueBatches = computed(() => {
-  return Array.from(new Set(filteredTableData.value.map(item => item.batch)));
+  return Array.from(new Set(AfilteredTableData.value.map(item => item.batch)));
 });
 
 // Function to select a batch and display its data
@@ -146,43 +163,44 @@ const AgoBack = () => {
 
 // Function to open the modal with shoe details
 const AshowShoeDetails = (shoe: any) => {
-  selectedShoeDetails.value = {
+  AselectedShoeDetails.value = {
     shoe: shoe.shoe,
     description: `Description for ${shoe.shoe}`,
     brand: "Brand: Nike",
     image: 'https://via.placeholder.com/150',
   };
-  modalOpen.value = true; // Open the modal when a shoe is selected
+  AmodalOpen.value = true; // Open the modal when a shoe is selected
 };
 
 // Function to close the shoe details modal
 const AcloseModal = () => {
-  modalOpen.value = false; // Close the modal
+  AmodalOpen.value = false; // Close the modal
 };
 
 // Modal handling for "Accept" and "Decline"
 const AconfirmAction = (action: string, item: any) => {
   // Show the confirmation popup
-  isPopupVisible.value = true;
+  AisPopupVisible.value = true;
   if (action === 'Decline') {
-    isDeclinePopup.value = true; // Show the decline reason input
+    AisDeclinePopup.value = true; // Show the decline reason input
   } else {
-    isDeclinePopup.value = false; // Show the accept confirmation
+    AisDeclinePopup.value = false; // Show the accept confirmation
   }
   console.log(`Action: ${action} on item`, item);
 };
 
 const AhandleDecline = () => {
   // Handle decline logic here (e.g., store the reason and update status)
-  console.log(`Declined for reason: ${declineReason.value}`);
-  isPopupVisible.value = false; // Close the popup
+  console.log(`Declined for reason: ${AdeclineReason.value}`);
+  AisPopupVisible.value = false; // Close the popup
 };
 
 const AhandleAccept = () => {
   // Handle accept logic here
   console.log('Accepted');
-  isPopupVisible.value = false; // Close the popup
+  AisPopupVisible.value = false; // Close the popup
 };
+
 
 
 
@@ -398,31 +416,32 @@ const AhandleAccept = () => {
       </div>
     </div>
 
-    <!-- Modal for confirmation (Accept/Decline) -->
-    <div v-if="AisPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            Are you sure you want to {{ AisDeclinePopup ? 'Decline' : 'Accept' }}?
-          </h2>
-          <Button @click="isPopupVisible = false" size="sm" variant="outline">Close</Button>
-        </div>
-        
-        <!-- Decline reason input -->
-        <div v-if="isDeclinePopup">
-          <Input v-model="AdeclineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
-        </div>
-
-        <div class="flex justify-between">
-          <Button @click="isPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
-            Cancel
-          </Button>
-          <Button @click="isDeclinePopup ? AhandleDecline() : AhandleAccept()" class="bg-green-500 text-white hover:bg-green-600">
-            Confirm
-          </Button>
-        </div>
-      </div>
+<!-- Modal for confirmation (Accept/Decline) -->
+<div v-if="AisPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+        Are you sure you want to {{ AisDeclinePopup ? 'Decline' : 'Accept' }}?
+      </h2>
+      <Button @click="AisPopupVisible = false" size="sm" variant="outline">Close</Button>
     </div>
+    
+    <!-- Decline reason input -->
+    <div v-if="AisDeclinePopup">
+      <Input v-model="AdeclineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
+    </div>
+
+    <div class="flex justify-between">
+      <Button @click="AisPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
+        Cancel
+      </Button>
+      <Button @click="AisDeclinePopup ? AhandleDecline() : AhandleAccept()" class="bg-green-500 text-white hover:bg-green-600">
+        Confirm
+      </Button>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -464,30 +483,47 @@ const AhandleAccept = () => {
       </div>
     </div>
 
-    <!-- Modal for confirmation (Accept/Decline) -->
-    <div v-if="isPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            Are you sure you want to {{ isDeclinePopup ? 'Decline' : 'Accept' }}?
-          </h2>
-          <Button @click="isPopupVisible = false" size="sm" variant="outline">Close</Button>
-        </div>
-        
-        <!-- Decline reason input -->
-        <div v-if="isDeclinePopup">
-          <Input v-model="declineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
-        </div>
+<!-- Modal for confirmation (Accept/Decline) -->
+<div v-if="isPopupVisible" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/3">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+        Are you sure you want to {{ isDeclinePopup ? 'Decline' : 'Accept' }}?
+      </h2>
+      <Button @click="isPopupVisible = false" size="sm" variant="outline">Close</Button>
+    </div>
+    
+    <!-- Decline reason input -->
+    <div v-if="isDeclinePopup">
+      <Input v-model="declineReason" placeholder="Enter reason for decline" class="mb-4 w-full" />
+    </div>
 
-        <div class="flex justify-between">
-          <Button @click="isPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
-            Cancel
-          </Button>
-          <Button @click="isDeclinePopup ? handleDecline() : handleAccept()" class="bg-green-500 text-white hover:bg-green-600">
-            Confirm
-          </Button>
-        </div>
+    <!-- Shoe Tech Dropdown (Only shown when accepting) -->
+    <div v-if="!isDeclinePopup">
+      <div class="mb-4">
+        <label for="shoe-tech" class="text-gray-800 dark:text-gray-200">Assign Shoe Tech</label>
+        <select id="shoe-tech" v-model="selectedShoeTech" class="w-full border border-gray-300 p-2 rounded-md mt-2">
+          <option v-for="tech in shoeTechList" :key="tech.id" :value="tech">
+            {{ tech.name }} (ID: {{ tech.id }})
+          </option>
+        </select>
       </div>
     </div>
+
+    <div class="flex justify-between">
+      <Button @click="isPopupVisible = false" class="bg-gray-500 text-white hover:bg-gray-600">
+        Cancel
+      </Button>
+      <Button 
+        @click="isDeclinePopup ? handleDecline() : handleAccept()"
+        class="bg-green-500 text-white hover:bg-green-600"
+      >
+        Confirm
+      </Button>
+    </div>
+  </div>
+</div>
+
+
   </SidebarProvider>
 </template>

@@ -21,9 +21,6 @@ const selectedShoeDetails = ref({
 
 const addShoeModalOpen = ref(false); // State for the add shoe modal
 
-
-
-
 const shoeDetails = ref({
   shoeId: "",
   branchNo: "",
@@ -34,9 +31,8 @@ const shoeDetails = ref({
   customerName: "",
   customerNumber: "",
   customerAddress: "",
+  shoeImage: "", // Placeholder for the image URL
 });
-
-
 
 // Initialization for Add Shoe Modal
 const initializeShoeDetails = () => {
@@ -50,6 +46,7 @@ const initializeShoeDetails = () => {
     customerName: "",
     customerNumber: "",
     customerAddress: "",
+    shoeImage: "", // Reset shoe image
   };
 };
 
@@ -65,7 +62,6 @@ interface Shoe {
   service: string;
   payment: string;
   selected?: boolean; 
-
 }
 
 // Sample table data with `selected` property added to each shoe
@@ -235,7 +231,19 @@ const addShoe = () => {
 const serviceOptions = ['Full Reglue', 'Partial Reglue', 'Re stitch'];
 const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
 
+// Handle image upload
+const handleImageUpload = (event: Event) => {
+  const fileInput = event.target as HTMLInputElement;
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    // For simplicity, you could convert the image to a URL, or use any other file handling method
+    shoeDetails.value.shoeImage = URL.createObjectURL(file); // You can use a backend to upload the file
+    console.log('Uploaded Image:', shoeDetails.value.shoeImage);
+  }
+};
+
 </script>
+
 
 <template>
   <SidebarProvider>
@@ -313,17 +321,18 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
           </div>
         </div>
 
-<!-- Modal for Add Shoe -->
-<div v-if="addShoeModalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+        <div v-if="addShoeModalOpen" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
   <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg max-h-[90vh] overflow-y-auto">
     <h2 class="text-lg font-semibold text-center">Add New Shoe</h2>
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Shoe ID</label>
-      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" />
+      <!-- Shoe ID field is now readonly -->
+      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" readonly />
     </div>
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Branch No</label>
-      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" />
+      <!-- Branch No field is now readonly -->
+      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" readonly />
     </div>
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Service</label>
@@ -360,12 +369,20 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
       <label class="block text-gray-600 dark:text-gray-300">Estimated Quotation:</label>
       <p class="text-lg font-semibold text-gray-800 dark:text-gray-200">₱{{ shoeDetails.quotation }}</p>
     </div>
+    
+    <!-- Image Upload Section -->
+    <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Upload Shoe Image</label>
+      <input type="file" @change="handleImageUpload" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md" />
+    </div>
+
     <div class="flex justify-end">
       <Button @click="addShoe" class="mr-2">Add Shoe</Button>
       <Button variant="outline" @click="closeAddShoeModal">Cancel</Button>
     </div>
   </div>
 </div>
+
 
         <!-- Modal for Edit Shoe -->
 <!-- Modal for Edit Shoe -->
@@ -376,13 +393,15 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
     <!-- Shoe ID -->
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Shoe ID</label>
-      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" />
+      <!-- Shoe ID field is now readonly -->
+      <Input v-model="shoeDetails.shoeId" placeholder="Enter Shoe ID" class="w-full" readonly />
     </div>
 
     <!-- Branch No -->
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Branch No</label>
-      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" />
+      <!-- Branch No field is now readonly -->
+      <Input v-model="shoeDetails.branchNo" placeholder="Enter Branch No" class="w-full" readonly />
     </div>
 
     <!-- Service -->
@@ -432,6 +451,12 @@ const paymentOptions = ['Gcash', 'Paymaya', 'Cash', 'Other'];
     <div class="mb-4">
       <label class="block text-gray-600 dark:text-gray-300">Estimated Quotation:</label>
       <p class="text-lg font-semibold text-gray-800 dark:text-gray-200">₱{{ shoeDetails.quotation }}</p>
+    </div>
+
+        <!-- Image Upload Section -->
+        <div class="mb-4">
+      <label class="block text-gray-600 dark:text-gray-300">Upload Shoe Image</label>
+      <input type="file" @change="handleImageUpload" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded-md" />
     </div>
 
     <!-- Action Buttons -->

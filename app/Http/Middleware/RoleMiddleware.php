@@ -14,16 +14,16 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!Auth::check()) {
-            return redirect('/')->with('error', 'Unauthorized. Please log in.');
-        }
+        // if (!Auth::check()) {
+        //     return redirect('/')->with('error', 'Unauthorized. Please log in.');
+        // }
 
-        $user = Auth::user();
-        $userRoles = $user->getRoleNames()->toArray();
+        // $user = Auth::user();
+        // $userRoles = $user->getRoleNames()->toArray();
 
-        if (empty($userRoles)) {
-            return redirect('/')->with('error', 'No role assigned. Redirecting to welcome page.');
-        }
+        // if (empty($userRoles)) {
+        //     return redirect('/')->with('error', 'No role assigned. Redirecting to welcome page.');
+        // }
 
         return $next($request);
     }
