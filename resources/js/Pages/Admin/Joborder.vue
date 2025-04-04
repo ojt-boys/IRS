@@ -144,7 +144,7 @@ const closeDetailsModal = () => {
 
 
 
-
+////// SHOE TECH /////
 
 const AsearchQuery = ref("");
 const AactiveBatch = ref<number | null>(null);
@@ -363,7 +363,7 @@ const AcloseDetailsModal = () => {
 
 
 
-
+           <!-- Shoe tech -->
           <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
             <div class="flex justify-between mb-4">
               <Input v-model="AsearchQuery" placeholder="Search..." class="w-1/2" />
